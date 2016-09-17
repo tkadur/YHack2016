@@ -145,6 +145,7 @@ var thing = function(type, position) {
 	this.numLettersRequired;
 	this.numLettersFormed = 0;
 	this.positions = [];
+	this.colors = [];
 
 	switch (this.type) {
 		case player_type:
@@ -160,6 +161,11 @@ var thing = function(type, position) {
 				vec.setLength(15);
 				vec.add(new THREE.Vector3(0, 80, 0));
 				this.positions.push(vec);
+				if (Math.random() > 0.5) {
+					this.colors.push(0x000044);
+				} else {
+					this.colors.push(0x000022);
+				}
 			}
 
 			for (var x = 0; x < 120; x++) {
@@ -169,6 +175,11 @@ var thing = function(type, position) {
 					Math.random() * 30 - 15
 					);
 				this.positions.push(vec);
+				if (Math.random() > 0.5) {
+					this.colors.push(0x000033);
+				} else {
+					this.colors.push(0x000055);
+				}
 			}
 			break;
 
@@ -185,6 +196,7 @@ var thing = function(type, position) {
 					bottom.y + (top.y - bottom.y) * x / total,
 					bottom.z + (top.z - bottom.z) * x / total
 				));
+				this.colors.push(0x000000);
 			}
 			shuffle(this.positions);
 			break;
@@ -197,7 +209,25 @@ var thing = function(type, position) {
 
 			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 20) {
 				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 20) {
-					this.positions.push(new THREE.Vector3(x, this.position.y - Math.random() * 10, z));
+					this.positions.push(new THREE.Vector3(
+						x + Math.random() * 20 - 10,
+						this.position.y - Math.random() * 10,
+						z + Math.random() * 20 - 10
+						));
+					var r = Math.floor(Math.random() * 3);
+					switch (r) {
+						case 0:
+							this.colors.push(0x333333);
+							break;
+
+						case 1:
+							this.colors.push(0x666666);
+							break;
+
+						case 2:
+							this.colors.push(0x000000);
+							break;
+					}
 				}
 			}
 			break;
@@ -300,13 +330,10 @@ function makeThing(id, type, position) {
 }
 
 makeThing(player_type, new THREE.Vector3(0, -40, 0));
-makeThing(line_type, new THREE.Vector3(0, -40, -100));
-makeThing(line_type, new THREE.Vector3(300, -40, -100));
-makeThing(line_type, new THREE.Vector3(300, -40, -400));
 
-makeThing(line_type, new THREE.Vector3(0, -40, 100));
-makeThing(line_type, new THREE.Vector3(300, -40, 100));
-makeThing(line_type, new THREE.Vector3(300, -40, 400));
+for (var iter = 0; iter < 40; iter++) {
+	makeThing(line_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
+}
 
 makeThing(path_type, new THREE.Vector3(0, -50, 0));
 
@@ -421,7 +448,7 @@ var letter = function(type, character, font) {
 			height: 0.1
 		}
 		);
-	this.material = new THREE.MeshLambertMaterial({
+	this.material = new THREE.MeshBasicMaterial({
 		color: 0x000000,
 		transparent: true,
 		opacity: 0
@@ -682,8 +709,8 @@ function render() {
 	camera.position.y += (cameraPosition.y - camera.position.y) / 50;
 	camera.position.z += (cameraPosition.z - camera.position.z) / 50;
 
-	camera.rotation.x += (rotationX - camera.rotation.x) / 50;
-	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 50;
+	camera.rotation.x += (rotationX - camera.rotation.x) / 20;
+	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 20;
 
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
@@ -711,6 +738,7 @@ function render() {
 					Math.random() * 4 - 2,
 					Math.random() * 4 - 2
 					));
+				l.mesh.material.color.setHex(t.colors[t.numLettersFormed]);
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 
 				t.numLettersFormed++;
