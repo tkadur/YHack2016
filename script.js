@@ -887,7 +887,7 @@ function addConsoleString(s) {
 			consoleLetters.push(l);
 
 			currentConsoleX += letterWidth;
-			if (currentConsoleX >= consoleX + consoleWidth && s[i] == " ") {
+			if (currentConsoleX >= consoleX + consoleWidth - 5 && s[i] == " ") {
 				currentConsoleX = consoleX;
 				currentConsoleY -= letterHeight * 1.3;
 				currentLineIndex++;
