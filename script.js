@@ -1,13 +1,15 @@
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
 
-var platform_geo, platform_material, platform_mesh;
+/* var platform_geo, platform_material, platform_mesh;
 
 platform_geo = new THREE.BoxGeometry(200, 10, 100);
 platform_material = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: true});
 platform_mesh = new THREE.Mesh(platform_geo, platform_material);
 scene.add(platform_mesh);
 platform_mesh.position.set(0, -50, 50);
+
+*/
 
 var camera = new THREE.PerspectiveCamera(
 	75,
@@ -188,14 +190,13 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 400;
+			this.numLettersRequired = 200;
 
-			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y, this.position.z - 50);
-			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 10, this.position.z + 50);
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y - 5, this.position.z + 50);
+			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 5, this.position.z - 50);
 
 			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 10) {
 				for (var z = bottomLeftFront.z; z < topRightBack.z; z += 10) {
-					this.positions.push(new THREE.Vector3(x + Math.random() * 4 - 2, this.position.y - Math.random() * 10, z + Math.random() * 4 - 2));
 					this.positions.push(new THREE.Vector3(x + Math.random() * 4 - 2, this.position.y - Math.random() * 10, z + Math.random() * 4 - 2));
 				}
 			}
@@ -290,7 +291,9 @@ makeThing(line_type, new THREE.Vector3(0, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
-makeThing(path_type, new THREE.Vector3(0, -60, 0));
+makeThing(path_type, new THREE.Vector3(0, -50, 50));
+makeThing(path_type, new THREE.Vector3(200, -50, 50));
+makeThing(path_type, new THREE.Vector3(400, -50, 50));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
