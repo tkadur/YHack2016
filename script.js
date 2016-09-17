@@ -188,14 +188,14 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 100;
+			this.numLettersRequired = 500;
 
 			var bottomLeftFront = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
-			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 10, this.position.z - 100);
+			var topRightBack = new THREE.Vector3(this.position.x + 500, this.position.y + 10, this.position.z - 100);
 
-			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 5) {
-				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 5) {
-					for (var z = bottomLeftFront.z; z > topRightBack.z; z -= 5) {
+			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 10) {
+				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 10) {
+					for (var z = bottomLeftFront.z; z > topRightBack.z; z -= 10) {
 						this.positions.push(new THREE.Vector3(x, y, z));
 					}
 				}
@@ -290,7 +290,7 @@ makeThing(line_type, new THREE.Vector3(0, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
-makeThing(path_type, new THREE.Vector3(0, 0, 0));
+makeThing(path_type, new THREE.Vector3(0, -50, 0));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
