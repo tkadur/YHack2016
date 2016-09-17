@@ -311,8 +311,23 @@ makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
 makeThing(path_type, new THREE.Vector3(0, -50, 50));
-makeThing(path_type, new THREE.Vector3(100, -50, 50));
-makeThing(path_type, new THREE.Vector3(200, -50, 50));
+makeThing(path_type, new THREE.Vector3(0, -50, -50));
+makeThing(path_type, new THREE.Vector3(0, -50, 150));
+makeThing(path_type, new THREE.Vector3(90, -50, 50));
+makeThing(path_type, new THREE.Vector3(90, -50, -50));
+makeThing(path_type, new THREE.Vector3(90, -50, 150));
+makeThing(path_type, new THREE.Vector3(180, -50, 50));
+makeThing(path_type, new THREE.Vector3(180, -50, -50));
+makeThing(path_type, new THREE.Vector3(180, -50, 150));
+makeThing(path_type, new THREE.Vector3(270, -50, 50));
+makeThing(path_type, new THREE.Vector3(270, -50, -50));
+makeThing(path_type, new THREE.Vector3(270, -50, 150));
+makeThing(path_type, new THREE.Vector3(360, -50, 50));
+makeThing(path_type, new THREE.Vector3(360, -50, 150));
+makeThing(path_type, new THREE.Vector3(360, -50, -50));
+makeThing(path_type, new THREE.Vector3(450, -50, 50));
+makeThing(path_type, new THREE.Vector3(450, -50, -50));
+makeThing(path_type, new THREE.Vector3(450, -50, 150));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
