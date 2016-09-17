@@ -1,24 +1,73 @@
 var scene = new THREE.Scene();
+var consoleScene = new THREE.Scene();
+
 var camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
 	0.1,
 	1000);
+var consoleCamera = new THREE.PerspectiveCamera(
+	75,
+	window.innerWidth / window.innerHeight,
+	0.1,
+	1000);
 
+// http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
+renderer.setClearColor(0xffffff);
+renderer.autoClear = false;
 renderer.setSize(
 	window.innerWidth,
 	window.innerHeight);
-renderer.setClearColor(0xffffff);
 document.body.appendChild(renderer.domElement);
 
 var dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(100, 100, 50);
 scene.add(dirLight);
+consoleScene.add(dirLight);
 
-camera.position.z = 300;
+var negativeZ = 0;
+var negativeX = 1;
+var positiveZ = 2;
+var positiveX = 3;
+
+var cameraDistance = 300;
+var cameraDir = 0;
+var cameraYRotation = 0;
+var cameraPosition = new THREE.Vector3(0, 0, cameraDistance);
+
+function cameraFollowsLeftTurn(nextPlayerPosition) {
+	console.log("l " + nextPlayerPosition);
+
+	cameraDir++;
+
+	cameraYRotation = Math.PI / 2 * cameraDir;
+	cameraPosition = new THREE.Vector3(map[nextPlayerPosition].x, map[nextPlayerPosition].y, map[nextPlayerPosition].z);
+	cameraPosition.add(new THREE.Vector3(
+		Math.sin(cameraYRotation) * cameraDistance,
+		0,
+		Math.cos(cameraYRotation) * cameraDistance
+		));
+}
+
+function cameraFollowsRightTurn(nextPlayerPosition) {
+	console.log("r " + nextPlayerPosition);
+
+	cameraDir--;
+
+	cameraYRotation = Math.PI / 2 * cameraDir;
+	cameraPosition = new THREE.Vector3(map[nextPlayerPosition].x, map[nextPlayerPosition].y, map[nextPlayerPosition].z);
+	cameraPosition.add(new THREE.Vector3(
+		Math.sin(cameraYRotation) * cameraDistance,
+		0,
+		Math.cos(cameraYRotation) * cameraDistance
+		));
+}
+
+camera.position.z = cameraDistance;
+consoleCamera.position.z = cameraDistance;
 
 var font;
 var fontLoader = new THREE.FontLoader();
@@ -33,13 +82,13 @@ var line_type = 0;
 
 function getIntroString(type) {
 	if (type == line_type) {
-		return "He comes across a line.";
+		return "He comes across a line. ";
 	}
 }
 
 function getFormerString(type) {
 	if (type == line_type) {
-		return "The line is straight and finite."
+		return "The line is straight and finite. "
 	}
 }
 
@@ -69,7 +118,7 @@ var thing = function(type, position) {
 	this.positions = [];
 
 	if (this.type == line_type) {
-		this.numLettersRequired = 10;
+		this.numLettersRequired = 50;
 
 		var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
 		var top = new THREE.Vector3(this.position.x, this.position.y - 100, this.position.z);
@@ -86,7 +135,45 @@ var thing = function(type, position) {
 	}
 }
 
-var map = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(400, 0, 0)];
+// 0 = east
+// 1 = north
+// 2 = west
+// 3 = south
+
+var eastOkay = false;
+var northOkay = false;
+var westOkay = false;
+var southOkay = false;
+
+var forwardOkay = false;
+var leftOkay = false;
+var backOkay = false;
+var rightOkay = false;
+
+var map = [
+	new THREE.Vector3(0, 0, 0),
+	new THREE.Vector3(400, 0, 0),
+	new THREE.Vector3(400, 0, -400),
+	new THREE.Vector3(400, 0, 400)
+];
+var coordsMap = [
+	[0, 0],
+	[1, 0],
+	[1, -1],
+	[1, 1]
+];
+
+function getMapIndexFromCoords(x, z) {
+	for (var i = 0; i < coordsMap.length; i++) {
+		if (coordsMap[i][0] == x && coordsMap[i][1] == z) {
+			return i;
+		}
+	}
+}
+
+var currentDirection = 0;
+var currentCoordX = 0;
+var currentCoordZ = 0;
 var playerPosition = 0;
 var visibility = 300;
 
@@ -96,7 +183,7 @@ function makeThing(id, type, position) {
 
 makeThing(player_type, new THREE.Vector3(0, 0, 0));
 makeThing(line_type, new THREE.Vector3(0, 0, -10));
-// makeThing(line_type, new THREE.Vector3(400, 0, -10));
+makeThing(line_type, new THREE.Vector3(400, 0, -10));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -131,17 +218,21 @@ var letter = function(type, character, font) {
 		);
 	this.material = new THREE.MeshLambertMaterial({
 		color: 0x000000,
-		transparent: true
+		transparent: true,
+		opacity: 0
 	});
 	this.mesh = new THREE.Mesh(this.geometry, this.material);
 
 	this.width = 0;
+
+	this.randomFactor = Math.random() - 0.5
 
 	// console letters
 	this.consoleTickElapsed = 0;
 	this.consoleLineIndex = 0;
 
 	// scene letters
+	this.sceneTick = 0;
 	this.sceneTickToForm = 100;
 }
 
@@ -188,6 +279,10 @@ letter.prototype.update = function() {
 			this.mesh.position.set(this.position.x, this.position.y, this.position.z);
 		}
 	} else {
+		this.material.opacity += 0.1;
+		if (this.material.opacity > 1) {
+			this.material.opacity = 1;
+		}
 		// if (this.type == console_type) {
 			this.velocity.subVectors(this.destination, this.position);
 			this.velocity.divideScalar(10);
@@ -201,6 +296,11 @@ letter.prototype.update = function() {
 
 		if (this.type == scene_type) {
 			this.sceneTickToForm--;
+			this.sceneTick++;
+
+			if (this.sceneTickToForm <= 0) {
+				this.mesh.rotation.y = this.sceneTick * this.randomFactor * 0.01;
+			}
 		}
 	}
 }
@@ -233,7 +333,7 @@ function addReserveString(s, id) {
 
 		currentReserveX += letterWidth * reserveMultiplier;
 		if (currentReserveX >= reserveX + reserveWidth) {
-			currentReserveX = reserveY;
+			currentReserveX = reserveX;
 			currentReserveY -= letterHeight;
 		}
 
@@ -252,9 +352,11 @@ var letterSpacing = 0.275;
 var letterWidth = 0;
 
 var gameOver = false;
-var playerMoved = false;
+var playerReadyToMove = false;
+var playerMakingMove = false;
+var playerMadeMove = false;
 
-function checkDisplay() {
+function checkDisplayAndStuff() {
 	var player = things[0]
 	for (var i = 1; i < things.length; i++) {
 		var t = things[i];
@@ -289,6 +391,8 @@ function checkDisplay() {
 			}
 		}
 	}
+
+	playerReadyToMove = true;
 }
 
 function init(font) {
@@ -299,33 +403,38 @@ function init(font) {
 	// main code
 
 	// check which things to display
-	checkDisplay();
-
 	// accordingly introduce new things with addConsoleString
-
 	// form the to-be-displayed things, free the no-longer-displayed things
+	checkDisplayAndStuff();
 
 	// ask the player to make a move
 }
 
 function addConsoleString(s) {
 	for (var i = 0; i < s.length; i++) {
-		var l = new letter(console_type, s[i], font);
-		l.setDestination(currentConsoleX, currentConsoleY, 0);
-		l.setPosition(currentConsoleX, currentConsoleY + Math.random() - 0.5, 0);
-		l.consoleLineIndex = currentLineIndex;
+		if (s[i] != "\n") {
+			var l = new letter(console_type, s[i], font);
+			l.setDestination(currentConsoleX, currentConsoleY, 0);
+			l.setPosition(currentConsoleX, currentConsoleY + Math.random() - 0.5, 0);
+			l.consoleLineIndex = currentLineIndex;
 
-		scene.add(l.mesh);
-		consoleLetters.push(l);
+			consoleScene.add(l.mesh);
+			consoleLetters.push(l);
 
-		currentConsoleX += letterWidth;
-		if (currentConsoleX >= consoleX + consoleWidth) {
+			currentConsoleX += letterWidth;
+			if (currentConsoleX >= consoleX + consoleWidth) {
+				currentConsoleX = consoleX;
+				currentConsoleY -= letterHeight * 1.3;
+				currentLineIndex++;
+			}
+		} else {
 			currentConsoleX = consoleX;
-			currentConsoleY -= letterHeight;
+			currentConsoleY -= letterHeight * 1.3;
 			currentLineIndex++;
 		}
+
 		if (currentConsoleY < consoleHeight) {
-			currentConsoleY += letterHeight;
+			currentConsoleY += letterHeight * 1.3;
 			currentLineIndex--;
 
 			for (var j = 0; j < consoleLetters.length; j++) {
@@ -341,9 +450,24 @@ function addConsoleString(s) {
 	}
 }
 
+var tick = 0;
+
 function render() {
 	requestAnimationFrame(render);
+
+	renderer.clear();
+	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+	renderer.render(consoleScene, consoleCamera);
+
+	renderer.clearDepth();
+	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(scene, camera);
+
+	tick++;
+	camera.position.x += (cameraPosition.x - camera.position.x) / 50;
+	camera.position.y += (cameraPosition.y - camera.position.y) / 50;
+	camera.position.z += (cameraPosition.z - camera.position.z) / 50;
+	camera.rotation.y += (cameraYRotation - camera.rotation.y) / 50;
 
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
@@ -371,7 +495,6 @@ function render() {
 					Math.random() * 4 - 2
 					));
 				l.setDestination(newDest.x, newDest.y, newDest.z);
-				logvector(l.destination, "ddd");
 
 				t.numLettersFormed++;
 			} else {
@@ -380,10 +503,121 @@ function render() {
 		}
 		l.update();
 	}
+
+	if (playerReadyToMove) {
+		if (!playerMakingMove) {
+			addConsoleString("\nThe player... ");
+
+			eastOkay = false;
+			northOkay = false;
+			westOkay = false;
+			southOkay = false;
+
+			forwardOkay = false;
+			leftOkay = false;
+			backOkay = false;
+			rightOkay = false;
+
+			for (var m = 0; m < coordsMap.length; m++) {
+				var x = coordsMap[m][0];
+				var z = coordsMap[m][1];
+
+				var direction = -1;
+
+				if (x - currentCoordX == 1 && z - currentCoordZ == 0) {
+					direction = 0;
+					eastOkay = true;
+				}
+				else if (x - currentCoordX == 0 && z - currentCoordZ == -1) {
+					direction = 1;
+					northOkay = true;
+				}
+				else if (x - currentCoordX == -1 && z - currentCoordZ == 0) {
+					direction = 2;
+					westOkay = true;
+				}
+				else if (x - currentCoordX == 0 && z - currentCoordZ == 1) {
+					direction = 3;
+					southOkay = true;
+				}
+
+				if (direction != -1) {
+					if ((direction - currentDirection) % 4 == 0) {
+						forwardOkay = true;
+						addConsoleString("\nf: moves forward. ");
+					}
+					else if ((direction - currentDirection) % 4 == 1) {
+						leftOkay = true;
+						addConsoleString("\nl: turns left. ");
+					}
+					else if ((direction - currentDirection) % 4 == 2) {
+						backOkay = true;
+						addConsoleString("\nb: goes back. ");
+					}
+					else if ((direction - currentDirection) % 4 == 3) {
+						rightOkay = true;
+						addConsoleString("\nr: turns right. ");
+					}
+				}
+			}
+
+			playerMakingMove = true;
+		}
+	}
+
+	if (playerMadeMove) {
+		playerReadyToMove = false;
+		playerMakingMove = false;
+		playerMadeMove = false;
+		checkDisplayAndStuff();
+	}
 }
 
 render();
 
 $("body").bind("keypress", function(event) {
-	addConsoleString("abcdefhiijidjsfkl");
+	if (event.which >= 97 && event.which <= 122) {
+		result = -3;
+		if (event.which == 102 && forwardOkay) {
+			result = 0;
+		} else if (event.which == 108 && leftOkay) {
+			result = 1;
+		} else if (event.which == 98 && backOkay) {
+			result = 2;
+		} else if (event.which == 114 && rightOkay) {
+			result = 3;
+		}
+
+		if (playerMakingMove) {
+			if ((!playerMadeMove) && (result != -3)) {
+				playerMadeMove = true;
+
+				currentDirection += result;
+				if (currentDirection % 4 == 0) {
+					currentCoordX++;
+				}
+				else if (currentDirection % 4 == 1) {
+					currentCoordZ--;
+				}
+				else if (currentDirection % 4 == 2) {
+					currentCoordX--;
+				}
+				else if (currentDirection % 4 == 3) {
+					currentCoordZ++;
+				}
+
+				playerPosition = getMapIndexFromCoords(currentCoordX, currentCoordZ);
+				console.log("get " + currentCoordX + ", " + currentCoordZ + " -> " + playerPosition);
+
+				if (result == 1) {
+					cameraFollowsLeftTurn(playerPosition);
+				}
+				else if (result == 3) {
+					cameraFollowsRightTurn(playerPosition);
+				}
+			}
+		}
+	} else {
+		addConsoleString("abcdefhiijidjsfkl");
+	}
 })
