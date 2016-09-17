@@ -192,8 +192,8 @@ var thing = function(type, position) {
 		case path_type:
 			this.numLettersRequired = 200;
 
-			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y - 5, this.position.z + 50);
-			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 5, this.position.z - 50);
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y - 5, this.position.z - 50);
+			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 5, this.position.z + 50);
 
 			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 10) {
 				for (var z = bottomLeftFront.z; z < topRightBack.z; z += 10) {
