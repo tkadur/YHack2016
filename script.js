@@ -24,7 +24,7 @@ var consoleCamera = new THREE.PerspectiveCamera(
 
 // http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
-	// antialias: true
+	antialias: true
 });
 renderer.setClearColor(0xffffff);
 renderer.autoClear = false;
@@ -51,8 +51,6 @@ var rotationX = 0;
 var rotationY = 0;
 
 function cameraFollowsLeftTurn(nextPlayerPosition) {
-	// console.log("l " + nextPlayerPosition);
-
 	cameraDir++;
 
 	cameraYRotation = Math.PI / 2 * cameraDir;
@@ -65,8 +63,6 @@ function cameraFollowsLeftTurn(nextPlayerPosition) {
 }
 
 function cameraFollowsRightTurn(nextPlayerPosition) {
-	// console.log("r " + nextPlayerPosition);
-
 	cameraDir--;
 
 	cameraYRotation = Math.PI / 2 * cameraDir;
@@ -92,7 +88,8 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 var player_type = -1;
 var line_type = 0;
 var path_type = 1;
-var horizontal_path_type = 2;
+var horizontal_path_type = 1.5;
+var tree_type = 2;
 
 function getIntroString(type) {
 	switch (type) {
@@ -108,6 +105,9 @@ function getIntroString(type) {
 		case horizontal_path_type:
 			return "He sees a path extending in front of him. ";
 			break;
+		case tree_type:
+			return "He looks aboves and sees a tree.";
+			break;
 	}
 }
 
@@ -120,7 +120,10 @@ function getFormerString(type) {
 			return "The line is straight and finite. ";
 			break;
 		case path_type:
-			return "A segment of a path is inseparable from THE path... "
+			return "A segment of a path is inseparable from the path. "
+			break;
+		case tree_type:
+			return "Lining along the paths, the trees appear brittle under the covering snow.";
 			break;
 		case horizontal_path_type:
 			return "A segment of a path is inseparable from THE path... "
@@ -194,7 +197,7 @@ var thing = function(type, position) {
 			this.numLettersRequired = 50;
 
 			var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
-			var top = new THREE.Vector3(this.position.x, this.position.y + 200, this.position.z);
+			var top = new THREE.Vector3(this.position.x, this.position.y + 100 + Math.random() * 100, this.position.z);
 
 			var total = (this.numLettersRequired - 1);
 			for (var x = 0; x <= total; x++) {
@@ -266,6 +269,48 @@ var thing = function(type, position) {
 							break;
 					}
 				}
+			}
+			break;
+
+		case tree_type:
+			this.numLettersRequired = 50;
+
+			var height = 150 + Math.random() * 100;
+			for (var y = 0; y < 50; y++) {
+				this.positions.push(new THREE.Vector3(
+					this.position.x + Math.random() * 4 - 2,
+					this.position.y + y / 30 * height + Math.random() * 4 - 2,
+					this.position.z + Math.random() * 4 - 2
+					));
+				var r = Math.floor(Math.random() * 3);
+				if (r == 0) {
+					this.colors.push(0x002200);
+				}
+				else if (r == 1) {
+					this.colors.push(0x001100);
+				}
+				else if (r == 2) {
+					this.colors.push(0x000000);
+				}
+			}
+
+			var climberY = 0;
+			var numBranches = Math.floor(Math.random() * 5) + 5;
+			for (var b = 0; b < numBranches; b++) {
+				climberY += Math.random() * (height - climberY);
+				var angle = Math.random() * Math.PI * 2;
+				var riseY = Math.random() * climberY / 2;
+				var radius = Math.random() * climberY / 2;
+
+				var numNodesOnBranch = Math.floor(Math.random() * 10) + 20;
+				for (var c = 0; c < numNodesOnBranch; c++) {
+					this.positions.push(new THREE.Vector3(
+						this.position.x + Math.cos(angle) * radius * c / numNodesOnBranch,
+						this.position.y + climberY + riseY * c / numNodesOnBranch,
+						this.position.z + Math.sin(angle) * radius * c / numNodesOnBranch
+						));
+				}
+				this.numLettersRequired += numNodesOnBranch;
 			}
 			break;
 	}
@@ -456,6 +501,10 @@ makeThing(horizontal_path_type, new THREE.Vector3(1400, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
 
+for (var iter = 0; iter < 40; iter++) {
+	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
+}
+
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
 
@@ -600,7 +649,6 @@ var currentReserveY = reserveY;
 var reserveWidth = 150;
 
 function addReserveString(s, id) {
-	// console.log(id);
 	for (var i = 0; i < s.length; i++) {
 		var l = new letter(scene_type, s[i], font);
 		l.thingID = id;
