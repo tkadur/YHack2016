@@ -4,6 +4,7 @@ var consoleScene = new THREE.Scene();
 var platform_geo, platform_material, platform_mesh;
 
 var platformAdded = false;
+var arriveMsg = false;
 
 platform_geo = new THREE.BoxGeometry(100, 10, 100);
 platform_material = new THREE.MeshBasicMaterial({color: 0xadd8e6});
@@ -94,7 +95,7 @@ var tree_type = 2;
 function getIntroString(type) {
 	switch (type) {
 		case player_type:
-			return "He was there the whole time. ";
+			return "He is there the whole time. ";
 			break;
 		case line_type:
 			return "He comes across a line. ";
@@ -668,12 +669,12 @@ function addReserveString(s, id) {
 	}
 }
 
-var consoleX = 70;
-var consoleY = -120;
+var consoleX = 100;
+var consoleY = -100;
 var currentConsoleX = consoleX;
 var currentConsoleY = consoleY;
 var currentLineIndex = 0;
-var consoleWidth = 200;
+var consoleWidth = 250;
 var consoleHeight = -200;
 var letterSpacing = 0.275;
 var letterWidth = 0;
@@ -750,7 +751,7 @@ function addConsoleString(s) {
 			consoleLetters.push(l);
 
 			currentConsoleX += letterWidth;
-			if (currentConsoleX >= consoleX + consoleWidth) {
+			if (currentConsoleX >= consoleX + consoleWidth && s[i] == " ") {
 				currentConsoleX = consoleX;
 				currentConsoleY -= letterHeight * 1.3;
 				currentLineIndex++;
@@ -847,7 +848,7 @@ function render() {
 
 	if (playerReadyToMove) {
 		if (!playerMakingMove) {
-			addConsoleString("\nThe player... ");
+			addConsoleString("\nThe player...\n");
 
 			eastOkay = false;
 			northOkay = false;
@@ -865,11 +866,11 @@ function render() {
 
 				var direction = -1;
 
-				if (x - currentCoordX == 1 && z - currentCoordZ == 0) {
+				if (x - currentCoordX == 1 && z - currentCoordZ == 0 && !(currentCoordX == 1 && currentCoordZ == 0)) {
 					direction = 0;
 					eastOkay = true;
 				}
-				else if (x - currentCoordX == 0 && z - currentCoordZ == -1) {
+				else if (x - currentCoordX == 0 && z - currentCoordZ == -1 && !(currentCoordX == 2 && currentCoordZ == 1)) {
 					direction = 1;
 					northOkay = true;
 				}
@@ -885,19 +886,19 @@ function render() {
 				if (direction != -1) {
 					if ((direction - currentDirection + 4) % 4 == 0) {
 						forwardOkay = true;
-						addConsoleString("\nf: moves forward. ");
+						addConsoleString("f: moves forward.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 1) {
 						leftOkay = true;
-						addConsoleString("\nl: turns left. ");
+						addConsoleString("l: turns left.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 2) {
 						backOkay = true;
-						addConsoleString("\nb: goes back. ");
+						addConsoleString("b: goes back.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 3) {
 						rightOkay = true;
-						addConsoleString("\nr: turns right. ");
+						addConsoleString("r: turns right.\n");
 					}
 				}
 			}
@@ -918,19 +919,29 @@ function render() {
 		checkDisplayAndStuff();
 	}
 
-	if (currentCoordX == 4 && currentCoordZ == 0 && !platformAdded) {
-		scene.add(platform_mesh);
-		platformAdded = true;
-	}
-
-	if (platformAdded) {
-		if (platform_mesh.position.y < -100) {
-			platform_mesh.position.y += .05;
+	if (currentCoordX == 4 && currentCoordZ == 0) {
+		if (!platformAdded) {
+			scene.add(platform_mesh);
+			platformAdded = true;
 		}
-		else {
-			platform_mesh.position.set(1600, -100, 0);
+		if (platformAdded) {
+			if (platform_mesh.position.y < -100) {
+				platform_mesh.position.y += .05;
+			}
+			else {
+				platform_mesh.position.set(1600, -100, 0);
+				if (!arriveMsg) {
+					addConsoleString("\n ");
+					addConsoleString("\n... ");
+					addConsoleString("\n ");
+					addConsoleString("\nThe player arrives. ");
+					arriveMsg = true;
+				}
+			}
+			platform_mesh.rotation.y += .01;
 		}
-		platform_mesh.rotation.y += .01;
+	} else {
+		arriveMsg = false;
 	}
 }
 
