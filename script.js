@@ -89,22 +89,33 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 // thing types
 var player_type = -1;
 var line_type = 0;
+var path_type = 1;
 
 function getIntroString(type) {
-	if (type == player_type) {
-		return "He was there the whole time. ";
-	}
-	else if (type == line_type) {
-		return "He comes across a line. ";
+	switch (type) {
+		case player_type:
+			return "He was there the whole time. ";
+			break;
+		case line_type:
+			return "He comes across a line. ";
+			break;
+		case path_type:
+			return "He sees a path extending in front of him. ";
+			break;
 	}
 }
 
 function getFormerString(type) {
-	if (type == player_type) {
-		return "**************************** ";
-	}
-	else if (type == line_type) {
-		return "The line is straight and finite. "
+	switch (type) {
+		case player_type:
+			return "**************************** ";
+			break;
+		case line_type:
+			return "The line is straight and finite. ";
+			break;
+		case path_type:
+			return "A segment of a path is inseparable from THE path... "
+			break;
 	}
 }
 
@@ -128,50 +139,68 @@ var thing = function(type, position) {
 	this.isDisplayed = false;
 	this.isFormed = false;
 	this.position = position;
-	
+
 	this.numLettersRequired;
 	this.numLettersFormed = 0;
 	this.positions = [];
 
-	if (this.type == player_type) {
-		this.numLettersRequired = 500;
-		this.isBlob = true;
+	switch (this.type) {
+		case player_type:
+			this.numLettersRequired = 500;
+			this.isBlob = true;
 
-		for (var x = 0; x < 150; x++) {
-			var vec = new THREE.Vector3(
-				Math.random() * 30 - 15,
-				Math.random() * 30 - 15,
-				Math.random() * 30 - 15
-				);
-			vec.setLength(15);
-			vec.add(new THREE.Vector3(0, 80, 0));
-			this.positions.push(vec);
-		}
+			for (var x = 0; x < 150; x++) {
+				var vec = new THREE.Vector3(
+					Math.random() * 30 - 15,
+					Math.random() * 30 - 15,
+					Math.random() * 30 - 15
+					);
+				vec.setLength(15);
+				vec.add(new THREE.Vector3(0, 80, 0));
+				this.positions.push(vec);
+			}
 
-		for (var x = 0; x < 350; x++) {
-			var vec = new THREE.Vector3(
-				Math.random() * 30 - 15,
-				Math.random() * 105 - 40,
-				Math.random() * 30 - 15
-				);
-			this.positions.push(vec);
-		}
-	}
-	else if (this.type == line_type) {
-		this.numLettersRequired = 50;
+			for (var x = 0; x < 350; x++) {
+				var vec = new THREE.Vector3(
+					Math.random() * 30 - 15,
+					Math.random() * 105 - 40,
+					Math.random() * 30 - 15
+					);
+				this.positions.push(vec);
+			}
+			break;
 
-		var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
-		var top = new THREE.Vector3(this.position.x, this.position.y + 200, this.position.z);
+		case line_type:
+			this.numLettersRequired = 50;
 
-		var total = (this.numLettersRequired - 1);
-		for (var x = 0; x <= total; x++) {
-			this.positions.push(new THREE.Vector3(
-				bottom.x + (top.x - bottom.x) * x / total,
-				bottom.y + (top.y - bottom.y) * x / total,
-				bottom.z + (top.z - bottom.z) * x / total
-			));
-		}
-		shuffle(this.positions);
+			var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
+			var top = new THREE.Vector3(this.position.x, this.position.y + 200, this.position.z);
+
+			var total = (this.numLettersRequired - 1);
+			for (var x = 0; x <= total; x++) {
+				this.positions.push(new THREE.Vector3(
+					bottom.x + (top.x - bottom.x) * x / total,
+					bottom.y + (top.y - bottom.y) * x / total,
+					bottom.z + (top.z - bottom.z) * x / total
+				));
+			}
+			shuffle(this.positions);
+			break;
+
+		case path_type:
+			this.numLettersRequired = 200;
+
+			var bottomLeftFront = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
+			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 10, this.position.z - 100);
+
+			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 5) {
+				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 5) {
+					for (var z = bottomLeftFront.z; y > topRightBack.z; z -= 5) {
+						this.positions.push(new THREE.Vector3(x, y, z));
+					}
+				}
+			}
+			break;
 	}
 }
 
@@ -260,6 +289,8 @@ makeThing(line_type, new THREE.Vector3(300, -40, -400));
 makeThing(line_type, new THREE.Vector3(0, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
+
+makeThing(path_type, new THREE.Vector3(0, 0, 0));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -590,14 +621,12 @@ function render() {
 			{
 				l.free();
 			}
-		} else {
-			if (l.sceneArrived) {
-				var t = things[l.thingID];
-				if (t.isBlob) {
-					var newDest = t.assignNewDestination();
-					l.setDestination(newDest.x, newDest.y, newDest.z);
-					l.sceneArrived = false;
-				}
+		} else if (l.sceneArrived) {
+			var t = things[l.thingID];
+			if (t.isBlob) {
+				var newDest = t.assignNewDestination();
+				l.setDestination(newDest.x, newDest.y, newDest.z);
+				l.sceneArrived = false;
 			}
 		}
 		l.update();
