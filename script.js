@@ -14,7 +14,7 @@ document.body.appendChild(renderer.domElement);
 camera.position.z = 5;
 
 var fontLoader = new THREE.FontLoader();
-fontLoader.load("fonts/helvetiker_regular.typeface.json", function(font) {
+fontLoader.load("http://threejs.org/examples/fonts/helvetiker_regular.typeface.json", function(font) {
 	init(font);
 	alert("!");
 });
