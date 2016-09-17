@@ -501,7 +501,7 @@ makeThing(horizontal_path_type, new THREE.Vector3(1400, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
 
-for (var iter = 0; iter < 40; iter++) {
+for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
 }
 
