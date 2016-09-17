@@ -197,9 +197,9 @@ var console_type = 1;
 var letter = function(type, character, font) {
 	this.type = type;
 	this.text = character; // the actual character
-	
+
 	this.thingID = -1; // the ID of the thing (potentially) formed by this character
-	
+
 	this.position = new THREE.Vector3(0, 0, 0);
 	this.velocity = new THREE.Vector3(0, 0, 0);
 	this.destination = new THREE.Vector3(0, 0, 0);
@@ -260,7 +260,7 @@ letter.prototype.update = function() {
 		if (this.material.opacity < 0.05) {
 			this.isDead = true;
 		}
-		
+
 		if (this.type == console_type) {
 			this.velocity.add(new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.5, Math.random() - 0.5)) * 0.5;
 			if (this.velocity.length() > this.speed) {

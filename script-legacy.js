@@ -1,6 +1,19 @@
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
 
+var box_geometry, box_material, box_mesh, road_geometry, road_mesh;
+
+box_geometry = new THREE.BoxGeometry(50, 200, 50);
+box_material = new THREE.MeshLambertMaterial({color: 0x0000dd, wireframe: true});
+box_mesh = new THREE.Mesh(box_geometry, box_material);
+scene.add(box_mesh);
+box_mesh.position.set(100, 0, 100);
+
+road_geometry = new THREE.BoxGeometry(500, 10, 50);
+road_mesh = new THREE.Mesh(road_geometry, box_material);
+scene.add(road_mesh);
+road_mesh.position.set(0, 0, 25);
+
 var camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
@@ -36,11 +49,9 @@ var positiveX = 3;
 var cameraDistance = 300;
 var cameraDir = 0;
 var cameraYRotation = 0;
-var cameraPosition = new THREE.Vector3(0, 0, cameraDistance);
+var cameraPosition = new THREE.Vector3(0, 100, cameraDistance);
 
 function cameraFollowsLeftTurn(nextPlayerPosition) {
-	// console.log("l " + nextPlayerPosition);
-
 	cameraDir++;
 
 	cameraYRotation = Math.PI / 2 * cameraDir;
@@ -53,8 +64,6 @@ function cameraFollowsLeftTurn(nextPlayerPosition) {
 }
 
 function cameraFollowsRightTurn(nextPlayerPosition) {
-	// console.log("r " + nextPlayerPosition);
-
 	cameraDir--;
 
 	cameraYRotation = Math.PI / 2 * cameraDir;
@@ -171,12 +180,9 @@ function getMapIndexFromCoords(x, z) {
 	}
 }
 
-
 // east: 0, north: 1, west: 2, south: 3
 var facingDirection = 0;
 var goingDirection = 0;
-
-
 
 var currentCoordX = 0;
 var currentCoordZ = 0;
@@ -203,9 +209,9 @@ var console_type = 1;
 var letter = function(type, character, font) {
 	this.type = type;
 	this.text = character; // the actual character
-	
+
 	this.thingID = -1; // the ID of the thing (potentially) formed by this character
-	
+
 	this.position = new THREE.Vector3(0, 0, 0);
 	this.velocity = new THREE.Vector3(0, 0, 0);
 	this.destination = new THREE.Vector3(0, 0, 0);
@@ -266,7 +272,7 @@ letter.prototype.update = function() {
 		if (this.material.opacity < 0.05) {
 			this.isDead = true;
 		}
-		
+
 		if (this.type == console_type) {
 			this.velocity.add(new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.5, Math.random() - 0.5)) * 0.5;
 			if (this.velocity.length() > this.speed) {
@@ -397,7 +403,6 @@ function checkDisplayAndStuff() {
 			}
 		}
 	}
-
 	playerReadyToMove = true;
 }
 
@@ -461,6 +466,8 @@ var tick = 0;
 function render() {
 	requestAnimationFrame(render);
 
+	box_mesh.rotation.y += .01;
+
 	renderer.clear();
 	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(consoleScene, consoleCamera);
@@ -510,65 +517,56 @@ function render() {
 		l.update();
 	}
 
-	if (playerReadyToMove) {
-		if (!playerMakingMove) {
-			addConsoleString("\nThe player... ");
-			
-			eastOkay = false;
-			northOkay = false;
-			westOkay = false;
-			southOkay = false;
+	if (playerReadyToMove & !playerMakingMove) {
+		addConsoleString("\nThe player... ");
 
-			forwardOkay = false;
-			leftOkay = false;
-			backOkay = false;
-			rightOkay = false;
+		eastOkay = false;
+		northOkay = false;
+		westOkay = false;
+		southOkay = false;
 
-			for (var m = 0; m < coordsMap.length; m++) {
+		forwardOkay = false;
+		leftOkay = false;
+		backOkay = false;
+		rightOkay = false;
 
-				var x = coordsMap[m][0];
-				var z = coordsMap[m][1];
+		for (var m = 0; m < coordsMap.length; m++) {
 
-				// var direction = -1;
+			var x = coordsMap[m][0];
+			var z = coordsMap[m][1];
 
-				if (x - currentCoordX == 1 && z - currentCoordZ == 0) {
-					// direction = 0;
-					eastOkay = true;
-				}
-				else if (x - currentCoordX == 0 && z - currentCoordZ == -1) {
-					// direction = 1;
-					northOkay = true;
-				}
-				else if (x - currentCoordX == -1 && z - currentCoordZ == 0) {
-					// direction = 2;
-					westOkay = true;
-				}
-				else if (x - currentCoordX == 0 && z - currentCoordZ == 1) {
-					// direction = 3;
-					southOkay = true;
-				}
-
-				// if (direction != -1) {
-				if ((eastOkay && facingDirection == 0) || (westOkay && facingDirection == 2) || (northOkay && facingDirection == 1) || (southOkay && facingDirection == 3)) {
-					forwardOkay = true;
-					addConsoleString("\nf: moves forward. ");
-				}
-				else if ((eastOkay && facingDirection == 3) || (southOkay && facingDirection == 2) || (westOkay && facingDirection == 1) || (northOkay && facingDirection == 0)) {
-					leftOkay = true;
-					addConsoleString("\nl: turns left. ");
-				}
-				else if ((eastOkay && facingDirection == 2) || (westOkay && facingDirection == 0) || (northOkay && facingDirection == 3) || (southOkay && facingDirection == 1)) {
-					backOkay = true;
-					addConsoleString("\nb: goes back. ");
-				}
-				else if ((westOkay && facingDirection == 3) || (southOkay && facingDirection == 0) || (eastOkay && facingDirection == 1) || (northOkay && facingDirection == 2)) {
-					rightOkay = true;
-					addConsoleString("\nr: turns right. ");
-				}
+			if (x - currentCoordX == 1 && z - currentCoordZ == 0) {
+				eastOkay = true;
 			}
-
-			playerMakingMove = true;
+			else if (x - currentCoordX == 0 && z - currentCoordZ == -1) {
+				northOkay = true;
+			}
+			else if (x - currentCoordX == -1 && z - currentCoordZ == 0) {
+				westOkay = true;
+			}
+			else if (x - currentCoordX == 0 && z - currentCoordZ == 1) {
+				southOkay = true;
+			}
 		}
+
+		if ((eastOkay && facingDirection == 0) || (westOkay && facingDirection == 2) || (northOkay && facingDirection == 1) || (southOkay && facingDirection == 3)) {
+			forwardOkay = true;
+			addConsoleString("\nf: moves forward. ");
+		}
+		if ((eastOkay && facingDirection == 3) || (southOkay && facingDirection == 2) || (westOkay && facingDirection == 1) || (northOkay && facingDirection == 0)) {
+			leftOkay = true;
+			addConsoleString("\nl: turns left. ");
+		}
+		if ((eastOkay && facingDirection == 2) || (westOkay && facingDirection == 0) || (northOkay && facingDirection == 3) || (southOkay && facingDirection == 1)) {
+			backOkay = true;
+			addConsoleString("\nb: goes back. ");
+		}
+		if ((westOkay && facingDirection == 3) || (southOkay && facingDirection == 0) || (eastOkay && facingDirection == 1) || (northOkay && facingDirection == 2)) {
+			rightOkay = true;
+			addConsoleString("\nr: turns right. ");
+		}
+
+		playerMakingMove = true;
 	}
 
 	if (playerMadeMove) {
@@ -582,47 +580,57 @@ function render() {
 render();
 
 $("body").bind("keypress", function(event) {
-	if (event.which >= 97 && event.which <= 122) {
-		console.log("event: " + event.which);
+	if (event.which >= 97 && event.which <= 122)
+	{
 
 		result = -3;
-		
+
 		// forward
-		if (event.which == 102 && forwardOkay) {
+		if (event.which == 102 && forwardOkay)
+		{
 			result = 0;
 			goingDirection = facingDirection;
 		}
-		
+
 		// leftward
-		else if (event.which == 108 && leftOkay) {
+		else if (event.which == 108 && leftOkay)
+		{
 			result = 1
 			goingDirection = (facingDirection + 1) % 4;
 		}
 
 		// backward
-		else if (event.which == 98 && backOkay) {
+		else if (event.which == 98 && backOkay)
+		{
 			result = 2;
 			goingDirection = (facingDirection + 2) % 4;
 		}
 
 		// rightward
-		else if (event.which == 114 && rightOkay) {
+		else if (event.which == 114 && rightOkay)
+		{
 			result = 3;
 			goingDirection = (facingDirection + 3) % 4
 		}
 
-		if (playerMakingMove) {
+		if (playerMakingMove)
+		{
 			if ((!playerMadeMove) && (result != -3)) {
 				playerMadeMove = true;
 
-				if (result == 1) {
+				if (result == 1)
+				{
 					cameraFollowsLeftTurn(playerPosition);
 				}
-				else if (result == 3) {
+				else if (result == 3)
+				{
 					cameraFollowsRightTurn(playerPosition);
 				}
-
-				// currentDirection += result;
+				else if (result == 2)
+				{
+					cameraFollowsLeftTurn(playerPosition);
+					cameraFollowsLeftTurn(playerPosition);
+				}
 
 				facingDirection = goingDirection;
 
@@ -640,12 +648,12 @@ $("body").bind("keypress", function(event) {
 						currentCoordZ++;
 						break;
 				}
-
 				playerPosition = getMapIndexFromCoords(currentCoordX, currentCoordZ);
-				console.log("get " + currentCoordX + ", " + currentCoordZ + " -> " + playerPosition);
 			}
 		}
-	} else {
+	}
+	else
+	{
 		addConsoleString("abcdefhiijidjsfkl");
 	}
 })
