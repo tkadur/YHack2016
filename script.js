@@ -380,13 +380,9 @@ letter.prototype.update = function() {
 			if (this.sceneTickToForm <= 0) {
 				this.mesh.rotation.y = this.sceneTick * this.randomFactor * 0.01;
 
-<<<<<<< HEAD
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
 				}
-=======
-				if (this.position.distanceTo(this.destination) <= 2) this.sceneArrived = true;
->>>>>>> 7eeeb8585867719f24c91699640bcfd0385fa788
 			}
 		}
 	}
