@@ -82,8 +82,54 @@ var font;
 var fontLoader = new THREE.FontLoader();
 fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 	font = response;
+	makeTextGeometries(font);
 	init(font);
 });
+
+var smallTextGeometries = [];
+var largeTextGeometries = [];
+var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *"
+
+var letterHeight = 9;
+var reserveMultiplier = 0.7;
+
+function makeTextGeometries(font) {
+	for (var i = 0; i < allString.length; i++) {
+		var smallGeometry = new THREE.TextGeometry(
+			allString[i],
+			{
+				font: font,
+				size: letterHeight * reserveMultiplier,
+				height: 0.1
+			}
+			);
+		smallTextGeometries.push(smallGeometry);
+
+		var largeGeometry = new THREE.TextGeometry(
+			allString[i],
+			{
+				font: font,
+				size: letterHeight,
+				height: 0.1
+			}
+			);
+		largeTextGeometries.push(largeGeometry);
+	}
+}
+
+function getSmallTextGeometry(character) {
+	var index = allString.indexOf(character);
+	if (character != -1) {
+		return smallTextGeometries[index];
+	}
+}
+
+function getLargeTextGeometry(character) {
+	var index = allString.indexOf(character);
+	if (character != -1) {
+		return largeTextGeometries[index];
+	}
+}
 
 // thing types
 var player_type = -1;
@@ -160,10 +206,10 @@ var thing = function(type, position) {
 
 	switch (this.type) {
 		case player_type:
-			this.numLettersRequired = 150;
+			this.numLettersRequired = 400;
 			this.isBlob = true;
 
-			for (var x = 0; x < 30; x++) {
+			for (var x = 0; x < 100; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 30 - 15,
@@ -179,7 +225,7 @@ var thing = function(type, position) {
 				}
 			}
 
-			for (var x = 0; x < 120; x++) {
+			for (var x = 0; x < 300; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 105 - 40,
@@ -213,7 +259,7 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 60;
+			this.numLettersRequired = 77;
 
 			var bottomLeftFront = new THREE.Vector3(this.position.x - 30, this.position.y - 5, this.position.z + 50);
 			var topRightBack = new THREE.Vector3(this.position.x + 30, this.position.y + 5, this.position.z - 50);
@@ -243,7 +289,7 @@ var thing = function(type, position) {
 			}
 			break;
 		case horizontal_path_type:
-			this.numLettersRequired = 60;
+			this.numLettersRequired = 77;
 
 			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 30);
 			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 30);
@@ -303,7 +349,7 @@ var thing = function(type, position) {
 				var riseY = Math.random() * climberY / 2;
 				var radius = Math.random() * climberY / 2;
 
-				var numNodesOnBranch = Math.floor(Math.random() * 5) + 10
+				var numNodesOnBranch = Math.floor(Math.random() * 10) + 20
 				for (var c = 0; c < numNodesOnBranch; c++) {
 					this.positions.push(new THREE.Vector3(
 						this.position.x + Math.cos(angle) * radius * c / numNodesOnBranch,
@@ -414,10 +460,14 @@ function makeThing(id, type, position) {
 	things.push(new thing(id, type, position));
 }
 
-makeThing(player_type, new THREE.Vector3(0, -40, 0));
+makeThing(player_type, new THREE.Vector3(0, -100, 0));
 
 for (var iter = 0; iter < 40; iter++) {
-	makeThing(line_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
+	makeThing(line_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
+}
+
+for (var iter = 0; iter < 10; iter++) {
+	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
 
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
@@ -502,13 +552,6 @@ makeThing(horizontal_path_type, new THREE.Vector3(1400, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
 
-for (var iter = 0; iter < 10; iter++) {
-	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
-}
-
-var letterHeight = 9;
-var reserveMultiplier = 0.7;
-
 var scene_type = 0;
 var console_type = 1;
 
@@ -529,14 +572,13 @@ var letter = function(type, character, font) {
 	this.isFree = false;
 	this.isDead = false;
 
-	this.geometry = new THREE.TextGeometry(
-		this.text,
-		{
-			font: font,
-			size: letterHeight * ((this.type == scene_type) ? reserveMultiplier : 1),
-			height: 0.1
-		}
-		);
+	this.geometry;
+	if (this.type == scene_type) {
+		this.geometry = getSmallTextGeometry(this.text);
+	}
+	else {
+		this.geometry = getLargeTextGeometry(this.text);
+	}
 	this.material = new THREE.MeshBasicMaterial({
 		color: 0x000000,
 		transparent: true,
