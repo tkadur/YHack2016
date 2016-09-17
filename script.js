@@ -80,10 +80,30 @@ consoleCamera.position.z = cameraDistance;
 
 var font;
 var fontLoader = new THREE.FontLoader();
+var arrayOfAlphabets = []
+
 fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 	font = response;
 	makeTextGeometries(font);
 	init(font);
+
+	for (var iter = 0; iter < 7; iter++) {
+		var alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		var char = alphabets[Math.floor(Math.random() * 52)];
+		var giantAlphabetGeometry = new THREE.TextGeometry(char, {
+			font: font,
+			size: 100 + Math.random() * 10,
+			height: 15 + Math.random() * 1.5
+		});
+		var giantAlphabetMaterial = new THREE.MeshBasicMaterial({color: 0x222222});
+		var giantAlphabetMesh = new THREE.Mesh(giantAlphabetGeometry, giantAlphabetMaterial);
+		giantAlphabetMesh.position.set(Math.random() * 1600, -100, Math.random() * 1600 - 800);
+		giantAlphabetMesh.rotation.x = Math.random() * Math.PI * 2;
+		giantAlphabetMesh.rotation.y = Math.random() * Math.PI * 2;
+		giantAlphabetMesh.rotation.z = Math.random() * Math.PI * 2;
+		scene.add(giantAlphabetMesh);
+		arrayOfAlphabets.push(giantAlphabetMesh);
+	}
 });
 
 var smallTextGeometries = [];
@@ -698,21 +718,6 @@ letter.prototype.free = function() {
 	this.isFree = true;
 }
 
-for (var iter = 0; iter < 40; iter++) {
-	fontLoader.load("fonts/lmmrfont.typeface.json", function(font) {
-		var giantAlphabetGeometry = new THREE.TextGeometry("b", {
-			font: font,
-			size: 200,
-			height: 10
-		});
-		var giantAlphabetMaterial = new THREE.MeshLambertMaterial(Math.random() * 0xffffff);
-		var giantAlphabetMesh = new THREE.Mesh(giantAlphabetGeometry, giantAlphabetMaterial);
-		scene.add(giantAlphabetMesh);
-		giantAlphabetMesh.position.set(new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
-	});
-
-}
-
 var sceneLetters = [];
 var consoleLetters = [];
 
@@ -1046,6 +1051,11 @@ function render() {
 	} else {
 		arriveMsg = false;
 	}
+
+	for (var i = 0; i < arrayOfAlphabets.length; i++) {
+		arrayOfAlphabets[i].rotation.y += .02;
+	}
+
 }
 
 render();
