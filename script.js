@@ -89,6 +89,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 // thing types
 var player_type = -1;
 var line_type = 0;
+var path_type = 1;
 
 function getIntroString(type) {
 	if (type == player_type) {
