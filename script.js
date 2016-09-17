@@ -88,6 +88,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 
 var smallTextGeometries = [];
 var largeTextGeometries = [];
+var giantTextGeometries = [];
 var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *"
 
 var letterHeight = 9;
@@ -114,6 +115,16 @@ function makeTextGeometries(font) {
 			}
 			);
 		largeTextGeometries.push(largeGeometry);
+
+		var giantGeometry = new THREE.TextGeometry(
+			allString[i],
+			{
+				font: font,
+				size: letterHeight * 200 + Math.random() * 20,
+				height: 20 + Math.random() * 5
+			}
+		);
+		giantTextGeometries.push(giantGeometry);
 	}
 }
 
@@ -129,6 +140,18 @@ function getLargeTextGeometry(character) {
 	if (character != -1) {
 		return largeTextGeometries[index];
 	}
+}
+
+function getRandomGiantTextGeometry() {
+	return giantTextGeometries[getRandomInt(0, allString.length)];
+}
+
+// Returns a random integer between min (included) and max (excluded)
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min)) + min;
 }
 
 // thing types
@@ -486,6 +509,10 @@ for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
 
+for (var iter = 0; iter < 20; iter++) {
+	makeThing(alphabet_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
+}
+
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
 makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
@@ -591,6 +618,8 @@ var letter = function(type, character, font) {
 	this.geometry;
 	if (this.type == scene_type) {
 		this.geometry = getSmallTextGeometry(this.text);
+	} else if (this.type == alphabet_type) {
+		this.geometry = getRandomGiantTextGeometry();
 	}
 	else {
 		this.geometry = getLargeTextGeometry(this.text);
