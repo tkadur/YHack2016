@@ -91,6 +91,7 @@ var line_type = 0;
 var path_type = 1;
 var horizontal_path_type = 1.5;
 var tree_type = 2;
+var alphabet_type = 3;
 
 function getIntroString(type) {
 	switch (type) {
@@ -107,7 +108,10 @@ function getIntroString(type) {
 			return "He sees a path extending in front of him. ";
 			break;
 		case tree_type:
-			return "He looks aboves and sees a tree.";
+			return "He looks aboves and sees a tree. ";
+			break;
+		case alphabet_type:
+			return "He perceives that this space is filled with alphabets. ";
 			break;
 	}
 }
@@ -128,6 +132,9 @@ function getFormerString(type) {
 			break;
 		case horizontal_path_type:
 			return "A segment of a path is inseparable from THE path... "
+			break;
+		case alphabet_type:
+			return "A giant alphabet floats. "
 			break;
 	}
 }
@@ -271,6 +278,15 @@ var thing = function(type, position) {
 					}
 				}
 			}
+			break;
+
+		case alphabet_type:
+			this.numLettersRequired = 1;
+
+			this.positions.push(new THREE.Vector3(this.position.x, this.position.y, this.position.z));
+
+			this.colors.push(Math.random() * 0xffffff);
+
 			break;
 
 		case tree_type:
