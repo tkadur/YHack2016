@@ -190,17 +190,18 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 200;
+			this.numLettersRequired = 100;
 
-			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y - 5, this.position.z - 50);
-			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 5, this.position.z + 50);
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 50);
+			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 50);
 
-			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 10) {
-				for (var z = bottomLeftFront.z; z < topRightBack.z; z += 10) {
-					this.positions.push(new THREE.Vector3(x + Math.random() * 4 - 2, this.position.y - Math.random() * 10, z + Math.random() * 4 - 2));
+			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 10) {
+				for (var y = bottomLeftFront.y; y <= topRightBack.y; y += 10) {
+					for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 10) {
+						this.positions.push(new THREE.Vector3(x, y, z));
+					}
 				}
 			}
-			shuffle(this.positions);
 			break;
 	}
 }
@@ -255,13 +256,31 @@ var map = [
 	new THREE.Vector3(0, -40, 0),
 	new THREE.Vector3(400, -40, 0),
 	new THREE.Vector3(400, -40, -400),
-	new THREE.Vector3(400, -40, 400)
+	new THREE.Vector3(400, -40, 400),
+	new THREE.Vector3(800, -40, -400),
+	new THREE.Vector3(800, -40, -800),
+	new THREE.Vector3(800, -40, 400),
+	new THREE.Vector3(800, -40, 800),
+	new THREE.Vector3(1200, -40, -400),
+	new THREE.Vector3(1200, -40, 0),
+	new THREE.Vector3(1200, -40, 800),
+	new THREE.Vector3(1200, -40, 400),
+	new THREE.Vector3(1600, -40, 0)
 ];
 var coordsMap = [
 	[0, 0],
 	[1, 0],
 	[1, -1],
-	[1, 1]
+	[1, 1],
+	[2, -1],
+	[2, -2],
+	[2, 1],
+	[2, 2],
+	[3, -1],
+	[3, 0],
+	[3, 2],
+	[3, 1],
+	[4, 0]
 ];
 
 function getMapIndexFromCoords(x, z) {
@@ -276,7 +295,7 @@ var currentDirection = 0;
 var currentCoordX = 0;
 var currentCoordZ = 0;
 var playerPosition = 0;
-var visibility = 300;
+var visibility = 200;
 
 function makeThing(id, type, position) {
 	things.push(new thing(id, type, position));
@@ -292,8 +311,8 @@ makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
 makeThing(path_type, new THREE.Vector3(0, -50, 50));
+makeThing(path_type, new THREE.Vector3(100, -50, 50));
 makeThing(path_type, new THREE.Vector3(200, -50, 50));
-makeThing(path_type, new THREE.Vector3(400, -50, 50));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
