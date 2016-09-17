@@ -355,7 +355,9 @@ letter.prototype.update = function() {
 			this.position.add(this.velocity);
 			this.mesh.position.set(this.position.x, this.position.y, this.position.z);
 		}
-	} else {
+	}
+	else
+	{
 		this.material.opacity += 0.1;
 		if (this.material.opacity > 1) {
 			this.material.opacity = 1;
@@ -378,9 +380,13 @@ letter.prototype.update = function() {
 			if (this.sceneTickToForm <= 0) {
 				this.mesh.rotation.y = this.sceneTick * this.randomFactor * 0.01;
 
+<<<<<<< HEAD
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
 				}
+=======
+				if (this.position.distanceTo(this.destination) <= 2) this.sceneArrived = true;
+>>>>>>> 7eeeb8585867719f24c91699640bcfd0385fa788
 			}
 		}
 	}
@@ -568,7 +574,8 @@ function render() {
 		if (l.isDead) {
 			scene.remove(l.mesh);
 			sceneLetters.splice(i, 1);
-		} else if ((l.sceneTickToForm == 0) && l.text != " ") {
+		}
+		else if ((l.sceneTickToForm == 0) && l.text != " ") {
 			l.sceneTickToForm = -1;
 			// move them towards characters!
 			var t = things[l.thingID];
@@ -582,7 +589,9 @@ function render() {
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 
 				t.numLettersFormed++;
-			} else {
+			}
+			else
+			{
 				l.free();
 			}
 		} else {
@@ -592,6 +601,16 @@ function render() {
 					var newDest = t.assignNewDestination();
 					l.setDestination(newDest.x, newDest.y, newDest.z);
 					l.sceneArrived = false;
+				}
+			}
+		}
+		else
+		{
+			if (t.type == player_type)
+			{
+				if (t.sceneArrived)
+				{
+					t.sceneArrived = false;
 				}
 			}
 		}
