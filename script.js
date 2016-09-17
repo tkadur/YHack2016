@@ -1,15 +1,15 @@
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
 
-/* var platform_geo, platform_material, platform_mesh;
+var platform_geo, platform_material, platform_mesh;
 
-platform_geo = new THREE.BoxGeometry(200, 10, 100);
-platform_material = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: true});
+var platformAdded = false;
+
+platform_geo = new THREE.BoxGeometry(100, 10, 100);
+platform_material = new THREE.MeshBasicMaterial({color: 0xadd8e6});
 platform_mesh = new THREE.Mesh(platform_geo, platform_material);
-scene.add(platform_mesh);
-platform_mesh.position.set(0, -50, 50);
 
-*/
+platform_mesh.position.set(1600, -150, 0);
 
 var camera = new THREE.PerspectiveCamera(
 	75,
@@ -51,7 +51,7 @@ var rotationX = 0;
 var rotationY = 0;
 
 function cameraFollowsLeftTurn(nextPlayerPosition) {
-	console.log("l " + nextPlayerPosition);
+	// console.log("l " + nextPlayerPosition);
 
 	cameraDir++;
 
@@ -65,7 +65,7 @@ function cameraFollowsLeftTurn(nextPlayerPosition) {
 }
 
 function cameraFollowsRightTurn(nextPlayerPosition) {
-	console.log("r " + nextPlayerPosition);
+	// console.log("r " + nextPlayerPosition);
 
 	cameraDir--;
 
@@ -92,6 +92,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 var player_type = -1;
 var line_type = 0;
 var path_type = 1;
+var horizontal_path_type = 2;
 
 function getIntroString(type) {
 	switch (type) {
@@ -102,6 +103,9 @@ function getIntroString(type) {
 			return "He comes across a line. ";
 			break;
 		case path_type:
+			return "He sees a path extending in front of him. ";
+			break;
+		case horizontal_path_type:
 			return "He sees a path extending in front of him. ";
 			break;
 	}
@@ -116,6 +120,9 @@ function getFormerString(type) {
 			return "The line is straight and finite. ";
 			break;
 		case path_type:
+			return "A segment of a path is inseparable from THE path... "
+			break;
+		case horizontal_path_type:
 			return "A segment of a path is inseparable from THE path... "
 			break;
 	}
@@ -202,13 +209,43 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 36;
+			this.numLettersRequired = 60;
 
-			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 50);
-			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 50);
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 30, this.position.y - 5, this.position.z + 50);
+			var topRightBack = new THREE.Vector3(this.position.x + 30, this.position.y + 5, this.position.z - 50);
 
-			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 20) {
-				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 20) {
+			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 10) {
+				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 10) {
+					this.positions.push(new THREE.Vector3(
+						x + Math.random() * 20 - 10,
+						this.position.y - Math.random() * 10,
+						z + Math.random() * 20 - 10
+						));
+					var r = Math.floor(Math.random() * 3);
+					switch (r) {
+						case 0:
+							this.colors.push(0x333333);
+							break;
+
+						case 1:
+							this.colors.push(0x666666);
+							break;
+
+						case 2:
+							this.colors.push(0x000000);
+							break;
+					}
+				}
+			}
+			break;
+		case horizontal_path_type:
+			this.numLettersRequired = 60;
+
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 30);
+			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 30);
+
+			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 10) {
+				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 10) {
 					this.positions.push(new THREE.Vector3(
 						x + Math.random() * 20 - 10,
 						this.position.y - Math.random() * 10,
@@ -287,6 +324,7 @@ var map = [
 	new THREE.Vector3(400, -40, 400),
 	new THREE.Vector3(800, -40, -400),
 	new THREE.Vector3(800, -40, -800),
+	new THREE.Vector3(800, -40, 0),
 	new THREE.Vector3(800, -40, 400),
 	new THREE.Vector3(800, -40, 800),
 	new THREE.Vector3(1200, -40, -400),
@@ -302,6 +340,7 @@ var coordsMap = [
 	[1, 1],
 	[2, -1],
 	[2, -2],
+	[2, 0],
 	[2, 1],
 	[2, 2],
 	[3, -1],
@@ -335,87 +374,87 @@ for (var iter = 0; iter < 40; iter++) {
 	makeThing(line_type, new THREE.Vector3(Math.random() * 1600, -40, Math.random() * 1600 - 800));
 }
 
-makeThing(path_type, new THREE.Vector3(0, -50, 0));
+makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
-makeThing(path_type, new THREE.Vector3(100, -50, 0));
-makeThing(path_type, new THREE.Vector3(200, -50, 0));
-makeThing(path_type, new THREE.Vector3(300, -50, 0));
-makeThing(path_type, new THREE.Vector3(400, -50, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(200, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(300, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(400, -100, 0));
 
-makeThing(path_type, new THREE.Vector3(400, -50, 100));
-makeThing(path_type, new THREE.Vector3(400, -50, 200));
-makeThing(path_type, new THREE.Vector3(400, -50, 300));
-makeThing(path_type, new THREE.Vector3(400, -50, 400));
+makeThing(path_type, new THREE.Vector3(400, -100, 100));
+makeThing(path_type, new THREE.Vector3(400, -100, 200));
+makeThing(path_type, new THREE.Vector3(400, -100, 300));
+makeThing(path_type, new THREE.Vector3(400, -100, 400));
 
-makeThing(path_type, new THREE.Vector3(400, -50, -100));
-makeThing(path_type, new THREE.Vector3(400, -50, -200));
-makeThing(path_type, new THREE.Vector3(400, -50, -300));
-makeThing(path_type, new THREE.Vector3(400, -50, -400));
+makeThing(path_type, new THREE.Vector3(400, -100, -100));
+makeThing(path_type, new THREE.Vector3(400, -100, -200));
+makeThing(path_type, new THREE.Vector3(400, -100, -300));
+makeThing(path_type, new THREE.Vector3(400, -100, -400));
 
-makeThing(path_type, new THREE.Vector3(500, -50, -400));
-makeThing(path_type, new THREE.Vector3(600, -50, -400));
-makeThing(path_type, new THREE.Vector3(700, -50, -400));
-makeThing(path_type, new THREE.Vector3(800, -50, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(500, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(600, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(700, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(800, -100, -400));
 
-makeThing(path_type, new THREE.Vector3(900, -50, -400));
-makeThing(path_type, new THREE.Vector3(1000, -50, -400));
-makeThing(path_type, new THREE.Vector3(1100, -50, -400));
-makeThing(path_type, new THREE.Vector3(1200, -50, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(900, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, -400));
+makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, -400));
 
-makeThing(path_type, new THREE.Vector3(500, -50, 400));
-makeThing(path_type, new THREE.Vector3(600, -50, 400));
-makeThing(path_type, new THREE.Vector3(700, -50, 400));
-makeThing(path_type, new THREE.Vector3(800, -50, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(500, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(600, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(700, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(800, -100, 400));
 
-makeThing(path_type, new THREE.Vector3(900, -50, 400));
-makeThing(path_type, new THREE.Vector3(1000, -50, 400));
-makeThing(path_type, new THREE.Vector3(1100, -50, 400));
-makeThing(path_type, new THREE.Vector3(1200, -50, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 400));
+makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 400));
 
-makeThing(path_type, new THREE.Vector3(800, -50, 500));
-makeThing(path_type, new THREE.Vector3(800, -50, 600));
-makeThing(path_type, new THREE.Vector3(800, -50, 700));
-makeThing(path_type, new THREE.Vector3(800, -50, 800));
+makeThing(path_type, new THREE.Vector3(800, -100, 500));
+makeThing(path_type, new THREE.Vector3(800, -100, 600));
+makeThing(path_type, new THREE.Vector3(800, -100, 700));
+makeThing(path_type, new THREE.Vector3(800, -100, 800));
 
-makeThing(path_type, new THREE.Vector3(800, -50, -500));
-makeThing(path_type, new THREE.Vector3(800, -50, -600));
-makeThing(path_type, new THREE.Vector3(800, -50, -700));
-makeThing(path_type, new THREE.Vector3(800, -50, -800));
+makeThing(path_type, new THREE.Vector3(800, -100, -500));
+makeThing(path_type, new THREE.Vector3(800, -100, -600));
+makeThing(path_type, new THREE.Vector3(800, -100, -700));
+makeThing(path_type, new THREE.Vector3(800, -100, -800));
 
-makeThing(path_type, new THREE.Vector3(800, -50, -300));
-makeThing(path_type, new THREE.Vector3(800, -50, -200));
-makeThing(path_type, new THREE.Vector3(800, -50, -100));
-makeThing(path_type, new THREE.Vector3(800, -50, 0));
+makeThing(path_type, new THREE.Vector3(800, -100, -300));
+makeThing(path_type, new THREE.Vector3(800, -100, -200));
+makeThing(path_type, new THREE.Vector3(800, -100, -100));
+makeThing(path_type, new THREE.Vector3(800, -100, 0));
 
-makeThing(path_type, new THREE.Vector3(900, -50, 0));
-makeThing(path_type, new THREE.Vector3(1000, -50, 0));
-makeThing(path_type, new THREE.Vector3(1100, -50, 0));
-makeThing(path_type, new THREE.Vector3(1200, -50, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 0));
 
-makeThing(path_type, new THREE.Vector3(900, -50, 800));
-makeThing(path_type, new THREE.Vector3(1000, -50, 800));
-makeThing(path_type, new THREE.Vector3(1100, -50, 800));
-makeThing(path_type, new THREE.Vector3(1200, -50, 800));
+makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 800));
+makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 800));
+makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 800));
+makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 800));
 
-makeThing(path_type, new THREE.Vector3(1200, -50, 300));
-makeThing(path_type, new THREE.Vector3(1200, -50, 200));
-makeThing(path_type, new THREE.Vector3(1200, -50, 100));
-makeThing(path_type, new THREE.Vector3(1200, -50, 0));
+makeThing(path_type, new THREE.Vector3(1200, -100, 300));
+makeThing(path_type, new THREE.Vector3(1200, -100, 200));
+makeThing(path_type, new THREE.Vector3(1200, -100, 100));
+makeThing(path_type, new THREE.Vector3(1200, -100, 0));
 
-makeThing(path_type, new THREE.Vector3(1200, -50, 100));
-makeThing(path_type, new THREE.Vector3(1200, -50, 200));
-makeThing(path_type, new THREE.Vector3(1200, -50, 300));
-makeThing(path_type, new THREE.Vector3(1200, -50, 400));
+makeThing(path_type, new THREE.Vector3(1200, -100, 100));
+makeThing(path_type, new THREE.Vector3(1200, -100, 200));
+makeThing(path_type, new THREE.Vector3(1200, -100, 300));
+makeThing(path_type, new THREE.Vector3(1200, -100, 400));
 
-makeThing(path_type, new THREE.Vector3(1200, -50, 500));
-makeThing(path_type, new THREE.Vector3(1200, -50, 600));
-makeThing(path_type, new THREE.Vector3(1200, -50, 700));
-makeThing(path_type, new THREE.Vector3(1200, -50, 800));
+makeThing(path_type, new THREE.Vector3(1200, -100, 500));
+makeThing(path_type, new THREE.Vector3(1200, -100, 600));
+makeThing(path_type, new THREE.Vector3(1200, -100, 700));
+makeThing(path_type, new THREE.Vector3(1200, -100, 800));
 
-makeThing(path_type, new THREE.Vector3(1300, -50, 0));
-makeThing(path_type, new THREE.Vector3(1400, -50, 0));
-makeThing(path_type, new THREE.Vector3(1500, -50, 0));
-makeThing(path_type, new THREE.Vector3(1600, -50, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1300, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1400, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
+makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -475,7 +514,7 @@ letter.prototype.calculateWidth = function() {
 }
 
 function logvector(v, header) {
-	console.log(header + ": " + v.x + ", " + v.y + ", " + v.z);
+	// console.log(header + ": " + v.x + ", " + v.y + ", " + v.z);
 }
 
 letter.prototype.setPosition = function(x, y, z) {
@@ -561,7 +600,7 @@ var currentReserveY = reserveY;
 var reserveWidth = 150;
 
 function addReserveString(s, id) {
-	console.log(id);
+	// console.log(id);
 	for (var i = 0; i < s.length; i++) {
 		var l = new letter(scene_type, s[i], font);
 		l.thingID = id;
@@ -829,6 +868,21 @@ function render() {
 		currentReserveY = reserveY;
 
 		checkDisplayAndStuff();
+	}
+
+	if (currentCoordX == 4 && currentCoordZ == 0 && !platformAdded) {
+		scene.add(platform_mesh);
+		platformAdded = true;
+	}
+
+	if (platformAdded) {
+		if (platform_mesh.position.y < -100) {
+			platform_mesh.position.y += .05;
+		}
+		else {
+			platform_mesh.position.set(1600, -100, 0);
+		}
+		platform_mesh.rotation.y += .01;
 	}
 }
 
