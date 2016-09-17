@@ -88,6 +88,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 
 var smallTextGeometries = [];
 var largeTextGeometries = [];
+
 var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *:"
 
 var letterHeight = 9;
@@ -331,7 +332,7 @@ var thing = function(type, position) {
 
 			this.positions.push(new THREE.Vector3(this.position.x, this.position.y, this.position.z));
 
-			this.colors.push(Math.random() * 0xffffff);
+			this.colors.push(0xff0000);
 
 			break;
 
@@ -646,9 +647,10 @@ var letter = function(type, character, font) {
 	this.geometry;
 	if (this.type == scene_type) {
 		this.geometry = getSmallTextGeometry(this.text);
-	} else if (this.type == alphabet_type) {
-		this.geometry = getRandomGiantTextGeometry();
 	}
+	/* else if (this.type == alphabet_type) {
+		this.geometry = getRandomGiantTextGeometry(this.text);
+	} */
 	else {
 		this.geometry = getLargeTextGeometry(this.text);
 	}
@@ -679,10 +681,6 @@ var letter = function(type, character, font) {
 letter.prototype.calculateWidth = function() {
 	this.geometry.computeBoundingBox();
 	this.width = this.geometry.boundingBox.max.x - this.geometry.boundingBox.min.x;
-}
-
-function logvector(v, header) {
-	// console.log(header + ": " + v.x + ", " + v.y + ", " + v.z);
 }
 
 letter.prototype.setPosition = function(x, y, z) {
@@ -753,6 +751,21 @@ letter.prototype.update = function() {
 
 letter.prototype.free = function() {
 	this.isFree = true;
+}
+
+for (var iter = 0; iter < 40; iter++) {
+	fontLoader.load("fonts/lmmrfont.typeface.json", function(font) {
+		var giantAlphabetGeometry = new THREE.TextGeometry("b", {
+			font: font,
+			size: 200,
+			height: 10
+		});
+		var giantAlphabetMaterial = new THREE.MeshLambertMaterial(Math.random() * 0xffffff);
+		var giantAlphabetMesh = new THREE.Mesh(giantAlphabetGeometry, giantAlphabetMaterial);
+		scene.add(giantAlphabetMesh);
+		giantAlphabetMesh.position.set(new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
+	});
+
 }
 
 var sceneLetters = [];
