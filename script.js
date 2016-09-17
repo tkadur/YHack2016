@@ -88,7 +88,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 
 var smallTextGeometries = [];
 var largeTextGeometries = [];
-var giantTextGeometries = [];
+/* var giantTextGeometries = []; */
 var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *"
 
 var letterHeight = 9;
@@ -116,15 +116,16 @@ function makeTextGeometries(font) {
 			);
 		largeTextGeometries.push(largeGeometry);
 
-		var giantGeometry = new THREE.TextGeometry(
+		/* var giantGeometry = new THREE.TextGeometry(
 			allString[i],
 			{
 				font: font,
-				size: letterHeight * 200 + Math.random() * 20,
-				height: 20 + Math.random() * 5
+				size: letterHeight * 2,
+				height: 20
 			}
 		);
 		giantTextGeometries.push(giantGeometry);
+		console.log(letterHeight * 2); */
 	}
 }
 
@@ -142,8 +143,11 @@ function getLargeTextGeometry(character) {
 	}
 }
 
-function getRandomGiantTextGeometry() {
-	return giantTextGeometries[getRandomInt(0, allString.length)];
+/* function getRandomGiantTextGeometry(character) {
+	var index = allString.indexOf(character);
+	if (character != -1) {
+		return giantTextGeometries[index];
+	}
 }
 
 // Returns a random integer between min (included) and max (excluded)
@@ -152,7 +156,7 @@ function getRandomInt(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min)) + min;
-}
+} */
 
 // thing types
 var player_type = -1;
@@ -354,7 +358,7 @@ var thing = function(type, position) {
 
 			this.positions.push(new THREE.Vector3(this.position.x, this.position.y, this.position.z));
 
-			this.colors.push(Math.random() * 0xffffff);
+			this.colors.push(0xff0000);
 
 			break;
 
@@ -509,10 +513,6 @@ for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
 
-for (var iter = 0; iter < 20; iter++) {
-	makeThing(alphabet_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
-}
-
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
 makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
@@ -601,11 +601,11 @@ var console_type = 1;
 // class letter
 // parameter character must be of length 1
 // parameter font must be loaded font
-var letter = function(type, character, font) {
+var letter = function(type, character, font, thingID) {
 	this.type = type;
 	this.text = character; // the actual character
 
-	this.thingID = -1; // the ID of the thing (potentially) formed by this character
+	this.thingID = thingID; // the ID of the thing (potentially) formed by this character
 
 	this.position = new THREE.Vector3(0, 0, 0);
 	this.velocity = new THREE.Vector3(0, 0, 0);
@@ -618,9 +618,10 @@ var letter = function(type, character, font) {
 	this.geometry;
 	if (this.type == scene_type) {
 		this.geometry = getSmallTextGeometry(this.text);
-	} else if (this.type == alphabet_type) {
-		this.geometry = getRandomGiantTextGeometry();
 	}
+	/* else if (this.type == alphabet_type) {
+		this.geometry = getRandomGiantTextGeometry(this.text);
+	} */
 	else {
 		this.geometry = getLargeTextGeometry(this.text);
 	}
@@ -648,10 +649,6 @@ var letter = function(type, character, font) {
 letter.prototype.calculateWidth = function() {
 	this.geometry.computeBoundingBox();
 	this.width = this.geometry.boundingBox.max.x - this.geometry.boundingBox.min.x;
-}
-
-function logvector(v, header) {
-	// console.log(header + ": " + v.x + ", " + v.y + ", " + v.z);
 }
 
 letter.prototype.setPosition = function(x, y, z) {
@@ -724,6 +721,21 @@ letter.prototype.free = function() {
 	this.isFree = true;
 }
 
+for (var iter = 0; iter < 40; iter++) {
+	fontLoader.load("fonts/lmmrfont.typeface.json", function(font) {
+		var giantAlphabetGeometry = new THREE.TextGeometry("b", {
+			font: font,
+			size: 200,
+			height: 10
+		});
+		var giantAlphabetMaterial = new THREE.MeshLambertMaterial(Math.random() * 0xffffff);
+		var giantAlphabetMesh = new THREE.Mesh(giantAlphabetGeometry, giantAlphabetMaterial);
+		scene.add(giantAlphabetMesh);
+		giantAlphabetMesh.position.set(new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
+	});
+
+}
+
 var sceneLetters = [];
 var consoleLetters = [];
 
@@ -739,7 +751,6 @@ var reserveWidth = 150;
 function addReserveString(s, id) {
 	for (var i = 0; i < s.length; i++) {
 		var l = new letter(scene_type, s[i], font);
-		l.thingID = id;
 		l.setDestination(currentReserveX, currentReserveY, 0);
 		l.setPosition(currentReserveX, currentReserveY - 20 - Math.random() * 5, 0);
 
@@ -812,7 +823,7 @@ function checkDisplayAndStuff() {
 }
 
 function init(font) {
-	var l = new letter(console_type, "a", font);
+	var l = new letter(console_type, "a", font, id);
 	l.calculateWidth();
 	letterWidth = l.width;
 
