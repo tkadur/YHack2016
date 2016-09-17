@@ -188,14 +188,14 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 200;
+			this.numLettersRequired = 100;
 
 			var bottomLeftFront = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
 			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 10, this.position.z - 100);
 
 			/*for (var x = bottomLeftFront.x; x < topRightBack.x; x += 5) {
 				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 5) {
-					for (var z = bottomLeftFront.z; y > topRightBack.z; z -= 5) {
+					for (var z = bottomLeftFront.z; z > topRightBack.z; z -= 5) {
 						this.positions.push(new THREE.Vector3(x, y, z));
 					}
 				}
