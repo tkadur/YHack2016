@@ -190,17 +190,18 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 200;
+			this.numLettersRequired = 100;
 
-			var bottomLeftFront = new THREE.Vector3(this.position.x - 100, this.position.y - 5, this.position.z + 50);
-			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 5, this.position.z - 50);
+			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 50);
+			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 50);
 
 			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 10) {
-				for (var z = bottomLeftFront.z; z < topRightBack.z; z += 10) {
-					this.positions.push(new THREE.Vector3(x + Math.random() * 4 - 2, this.position.y - Math.random() * 10, z + Math.random() * 4 - 2));
+				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 10) {
+					for (var z = bottomLeftFront.z; z > topRightBack.z; z -= 10) {
+						this.positions.push(new THREE.Vector3(x, y, z));
+					}
 				}
 			}
-			shuffle(this.positions);
 			break;
 	}
 }
@@ -292,8 +293,8 @@ makeThing(line_type, new THREE.Vector3(300, -40, 100));
 makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
 makeThing(path_type, new THREE.Vector3(0, -50, 50));
+makeThing(path_type, new THREE.Vector3(100, -50, 50));
 makeThing(path_type, new THREE.Vector3(200, -50, 50));
-makeThing(path_type, new THREE.Vector3(400, -50, 50));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
