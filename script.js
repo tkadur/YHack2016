@@ -102,7 +102,7 @@ function getIntroString(type) {
 			return "He sees a path extending in front of him. ";
 			break;
 		case tree_type:
-			return "He looks aboves and sees a tree.";
+			return "He looks aboves and sees a tree. ";
 			break;
 	}
 }
@@ -119,7 +119,7 @@ function getFormerString(type) {
 			return "A segment of a path is inseparable from the path. "
 			break;
 		case tree_type:
-			return "Lining along the paths, the trees appear brittle under the covering snow.";
+			return "Lining along the paths, the trees appear brittle under the covering snow. ";
 			break;
 	}
 }
@@ -258,14 +258,14 @@ var thing = function(type, position) {
 			}
 
 			var climberY = 0;
-			var numBranches = Math.floor(Math.random() * 5) + 5;
+			var numBranches = Math.floor(Math.random() * 10) + 5;
 			for (var b = 0; b < numBranches; b++) {
 				climberY += Math.random() * (height - climberY);
 				var angle = Math.random() * Math.PI * 2;
 				var riseY = Math.random() * climberY / 2;
 				var radius = Math.random() * climberY / 2;
 
-				var numNodesOnBranch = Math.floor(Math.random() * 10) + 20;
+				var numNodesOnBranch = Math.floor(Math.random() * 5) + 10
 				for (var c = 0; c < numNodesOnBranch; c++) {
 					this.positions.push(new THREE.Vector3(
 						this.position.x + Math.cos(angle) * radius * c / numNodesOnBranch,
