@@ -25,7 +25,7 @@ var consoleCamera = new THREE.PerspectiveCamera(
 
 // http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
-	antialias: true
+	// antialias: true
 });
 renderer.setClearColor(0xffffff);
 renderer.autoClear = false;
@@ -88,8 +88,8 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 
 var smallTextGeometries = [];
 var largeTextGeometries = [];
-/* var giantTextGeometries = []; */
-var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *"
+
+var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *:"
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -115,17 +115,6 @@ function makeTextGeometries(font) {
 			}
 			);
 		largeTextGeometries.push(largeGeometry);
-
-		/* var giantGeometry = new THREE.TextGeometry(
-			allString[i],
-			{
-				font: font,
-				size: letterHeight * 2,
-				height: 20
-			}
-		);
-		giantTextGeometries.push(giantGeometry);
-		console.log(letterHeight * 2); */
 	}
 }
 
@@ -142,21 +131,6 @@ function getLargeTextGeometry(character) {
 		return largeTextGeometries[index];
 	}
 }
-
-/* function getRandomGiantTextGeometry(character) {
-	var index = allString.indexOf(character);
-	if (character != -1) {
-		return giantTextGeometries[index];
-	}
-}
-
-// Returns a random integer between min (included) and max (excluded)
-// Using Math.round() will give you a non-uniform distribution!
-function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min)) + min;
-} */
 
 // thing types
 var player_type = -1;
@@ -240,7 +214,7 @@ var thing = function(type, position) {
 
 	switch (this.type) {
 		case player_type:
-			this.numLettersRequired = 400;
+			this.numLettersRequired = 300;
 			this.isBlob = true;
 
 			for (var x = 0; x < 100; x++) {
@@ -259,7 +233,7 @@ var thing = function(type, position) {
 				}
 			}
 
-			for (var x = 0; x < 300; x++) {
+			for (var x = 0; x < 200; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 105 - 40,
@@ -275,7 +249,7 @@ var thing = function(type, position) {
 			break;
 
 		case line_type:
-			this.numLettersRequired = 50;
+			this.numLettersRequired = 30;
 
 			var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
 			var top = new THREE.Vector3(this.position.x, this.position.y + 100 + Math.random() * 100, this.position.z);
@@ -363,10 +337,10 @@ var thing = function(type, position) {
 			break;
 
 		case tree_type:
-			this.numLettersRequired = 50;
+			this.numLettersRequired = 70;
 
-			var height = 150 + Math.random() * 100;
-			for (var y = 0; y < 50; y++) {
+			var height = 50 + Math.random() * 100;
+			for (var y = 0; y < 70; y++) {
 				this.positions.push(new THREE.Vector3(
 					this.position.x + Math.random() * 4 - 2,
 					this.position.y + y / 30 * height + Math.random() * 4 - 2,
@@ -385,14 +359,14 @@ var thing = function(type, position) {
 			}
 
 			var climberY = 0;
-			var numBranches = Math.floor(Math.random() * 10) + 5;
+			var numBranches = Math.floor(Math.random() * 5) + 10;
 			for (var b = 0; b < numBranches; b++) {
 				climberY += Math.random() * (height - climberY);
 				var angle = Math.random() * Math.PI * 2;
-				var riseY = Math.random() * climberY / 2;
-				var radius = Math.random() * climberY / 2;
+				var riseY = Math.random() * climberY;
+				var radius = Math.random() * climberY * 2;
 
-				var numNodesOnBranch = Math.floor(Math.random() * 10) + 20
+				var numNodesOnBranch = Math.floor(Math.random() * 5) + 5
 				for (var c = 0; c < numNodesOnBranch; c++) {
 					this.positions.push(new THREE.Vector3(
 						this.position.x + Math.cos(angle) * radius * c / numNodesOnBranch,
@@ -497,10 +471,10 @@ var currentDirection = 0;
 var currentCoordX = 0;
 var currentCoordZ = 0;
 var playerPosition = 0;
-var visibility = 300;
+var visibility = 400;
 
-function makeThing(id, type, position) {
-	things.push(new thing(id, type, position));
+function makeThing(type, position) {
+	things.push(new thing(type, position));
 }
 
 makeThing(player_type, new THREE.Vector3(0, -100, 0));
@@ -644,6 +618,9 @@ var letter = function(type, character, font, thingID) {
 	this.sceneTick = 0;
 	this.sceneTickToForm = 100;
 	this.sceneArrived = false;
+
+	// snowflakes
+	this.isSnowflake = false;
 }
 
 letter.prototype.calculateWidth = function() {
@@ -786,8 +763,8 @@ function checkDisplayAndStuff() {
 	var player = things[0];
 	for (var i = 0; i < things.length; i++) {
 		var t = things[i];
-		var dist = t.position.distanceTo(player.position);
-		if (i == 0 || dist <= visibility) {
+		var dist = t.position.distanceToSquared(player.position);
+		if (i == 0 || dist <= visibility * visibility) {
 			t.isDisplayed = true;
 
 			if (!encounters[t.type]) {
@@ -898,11 +875,38 @@ function render() {
 	camera.rotation.x += (rotationX - camera.rotation.x) / 20;
 	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 20;
 
+	for (var iter = 0; iter < 1; iter++) {
+		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
+		flake.isSnowflake = true;
+		flake.setPosition(Math.random() * 1600, 300, Math.random() * 1600 - 800);
+		flake.setDestination(flake.position.x + Math.random() * 100 - 50, -200, flake.position.z + Math.random() * 100 - 50);
+		flake.speed = 2;
+
+		var color;
+		var r = Math.floor(Math.random() * 3);
+		if (r == 0) {
+			color = 0xdddddd;
+		}
+		else if (r == 1) {
+			color = 0xcccccc;
+		}
+		else if (r == 2) {
+			color = 0xaaaaaa;
+		}
+
+		flake.mesh.material.color.setHex(color);
+		scene.add(flake.mesh);
+		consoleLetters.push(flake);
+	}
+
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
 		if (l.isDead) {
 			scene.remove(l.mesh);
 			consoleLetters.splice(i, 1);
+		}
+		if (l.isSnowflake && l.position.y < -100) {
+			l.free();
 		}
 		l.update();
 	}
