@@ -137,6 +137,7 @@ var line_type = 0;
 var path_type = 1;
 var horizontal_path_type = 1.5;
 var tree_type = 2;
+var alphabet_type = 3;
 
 function getIntroString(type) {
 	switch (type) {
@@ -154,6 +155,9 @@ function getIntroString(type) {
 			break;
 		case tree_type:
 			return "He looks aboves and sees a tree. ";
+			break;
+		case alphabet_type:
+			return "He perceives that this space is filled with alphabets. ";
 			break;
 	}
 }
@@ -174,6 +178,9 @@ function getFormerString(type) {
 			break;
 		case horizontal_path_type:
 			return "A segment of a path is inseparable from THE path... "
+			break;
+		case alphabet_type:
+			return "A giant alphabet floats. "
 			break;
 	}
 }
@@ -317,6 +324,15 @@ var thing = function(type, position) {
 					}
 				}
 			}
+			break;
+
+		case alphabet_type:
+			this.numLettersRequired = 1;
+
+			this.positions.push(new THREE.Vector3(this.position.x, this.position.y, this.position.z));
+
+			this.colors.push(Math.random() * 0xffffff);
+
 			break;
 
 		case tree_type:
@@ -470,6 +486,10 @@ for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
 
+for (var iter = 0; iter < 20; iter++) {
+	makeThing(alphabet_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
+}
+
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
 makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
@@ -575,6 +595,8 @@ var letter = function(type, character, font) {
 	this.geometry;
 	if (this.type == scene_type) {
 		this.geometry = getSmallTextGeometry(this.text);
+	} else if (this.type == alphabet_type) {
+		this.geometry = getRandomGiantTextGeometry();
 	}
 	else {
 		this.geometry = getLargeTextGeometry(this.text);
