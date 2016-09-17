@@ -600,16 +600,6 @@ function render() {
 				}
 			}
 		}
-		else
-		{
-			if (t.type == player_type)
-			{
-				if (t.sceneArrived)
-				{
-					t.sceneArrived = false;
-				}
-			}
-		}
 		l.update();
 	}
 
