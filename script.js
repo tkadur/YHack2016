@@ -93,8 +93,13 @@ var player_type = -1;
 var line_type = 0;
 
 function getIntroString(type) {
-	if (type == line_type) {
-		return "He comes across a line. ";
+	switch (type) {
+		case line_type:
+			return "He comes across a line. ";
+			break;
+		case player_type:
+			return "The player? He is surely going to die! ";
+			break;
 	}
 }
 
@@ -251,6 +256,7 @@ var letter = function(type, character, font) {
 	// scene letters
 	this.sceneTick = 0;
 	this.sceneTickToForm = 100;
+	this.sceneArrived = false;
 }
 
 letter.prototype.calculateWidth = function() {
@@ -295,7 +301,9 @@ letter.prototype.update = function() {
 			this.position.add(this.velocity);
 			this.mesh.position.set(this.position.x, this.position.y, this.position.z);
 		}
-	} else {
+	}
+	else
+	{
 		this.material.opacity += 0.1;
 		if (this.material.opacity > 1) {
 			this.material.opacity = 1;
@@ -317,6 +325,8 @@ letter.prototype.update = function() {
 
 			if (this.sceneTickToForm <= 0) {
 				this.mesh.rotation.y = this.sceneTick * this.randomFactor * 0.01;
+
+				if (this.position.distanceTo(this.destination) <= 2) this.sceneArrived = true;
 			}
 		}
 	}
@@ -510,7 +520,8 @@ function render() {
 		if (l.isDead) {
 			scene.remove(l.mesh);
 			sceneLetters.splice(i, 1);
-		} else if ((l.sceneTickToForm == 0) && l.text != " ") {
+		}
+		else if ((l.sceneTickToForm == 0) && l.text != " ") {
 			l.sceneTickToForm = -1;
 			// move them towards characters!
 			var t = things[l.thingID];
@@ -524,8 +535,20 @@ function render() {
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 
 				t.numLettersFormed++;
-			} else {
+			}
+			else
+			{
 				l.free();
+			}
+		}
+		else
+		{
+			if (t.type == player_type)
+			{
+				if (t.sceneArrived)
+				{
+					t.sceneArrived = false;
+				}
 			}
 		}
 		l.update();
