@@ -193,13 +193,13 @@ var thing = function(type, position) {
 			var bottomLeftFront = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
 			var topRightBack = new THREE.Vector3(this.position.x + 100, this.position.y + 10, this.position.z - 100);
 
-			for (var x = bottomLeftFront.x; x < topRightBack.x; x += 5) {
+			/*for (var x = bottomLeftFront.x; x < topRightBack.x; x += 5) {
 				for (var y = bottomLeftFront.y; y < topRightBack.y; y += 5) {
 					for (var z = bottomLeftFront.z; y > topRightBack.z; z -= 5) {
 						this.positions.push(new THREE.Vector3(x, y, z));
 					}
 				}
-			}
+			}*/
 			break;
 	}
 }
