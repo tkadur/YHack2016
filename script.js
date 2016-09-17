@@ -16,16 +16,16 @@ var camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
 	0.1,
-	1000);
+	500);
 var consoleCamera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
 	0.1,
-	1000);
+	500);
 
 // http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
-	// antialias: true
+	antialias: true
 });
 renderer.setClearColor(0xffffff);
 renderer.autoClear = false;
@@ -363,9 +363,9 @@ var thing = function(type, position) {
 				climberY += Math.random() * (height - climberY);
 				var angle = Math.random() * Math.PI * 2;
 				var riseY = Math.random() * climberY;
-				var radius = Math.random() * climberY * 2;
+				var radius = Math.random() * climberY;
 
-				var numNodesOnBranch = Math.floor(Math.random() * 5) + 5
+				var numNodesOnBranch = Math.floor(Math.random() * 10) + 10
 				for (var c = 0; c < numNodesOnBranch; c++) {
 					this.positions.push(new THREE.Vector3(
 						this.position.x + Math.cos(angle) * radius * c / numNodesOnBranch,
@@ -472,12 +472,34 @@ var currentCoordZ = 0;
 var playerPosition = 0;
 var visibility = 400;
 
+function makeTreesAndLinesBetween(v1, v2) {
+	var trees = Math.floor(Math.random() * 3);
+	for (var t = 0; t < trees; t++) {
+		var f = Math.random();
+		makeThing(tree_type, new THREE.Vector3(
+			v1.x + (v2.x - v1.x) * f,
+			v1.y + (v2.y - v1.y) * f,
+			v1.z + (v2.z - v1.z) * f
+			));
+	}
+
+	var lines = Math.floor(Math.random() * 7);
+	for (var l = 0; l < lines; l++) {
+		var f = Math.random();
+		makeThing(line_type, new THREE.Vector3(
+			v1.x + (v2.x - v1.x) * f,
+			v1.y + (v2.y - v1.y) * f,
+			v1.z + (v2.z - v1.z) * f
+			));
+	}
+}
+
 function makeThing(type, position) {
 	things.push(new thing(type, position));
 }
 
 makeThing(player_type, new THREE.Vector3(0, -100, 0));
-
+/*
 for (var iter = 0; iter < 40; iter++) {
 	makeThing(line_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
@@ -485,10 +507,7 @@ for (var iter = 0; iter < 40; iter++) {
 for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
-
-for (var iter = 0; iter < 20; iter++) {
-	makeThing(alphabet_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
-}
+*/
 
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
@@ -496,81 +515,113 @@ makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(200, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(300, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(400, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(0, -100, -70), new THREE.Vector3(400, -100, -70));
+makeTreesAndLinesBetween(new THREE.Vector3(0, -100, 70), new THREE.Vector3(400, -100, 70));
 
 makeThing(path_type, new THREE.Vector3(400, -100, 100));
 makeThing(path_type, new THREE.Vector3(400, -100, 200));
 makeThing(path_type, new THREE.Vector3(400, -100, 300));
 makeThing(path_type, new THREE.Vector3(400, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(470, -100, 0), new THREE.Vector3(470, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(330, -100, 400), new THREE.Vector3(330, -100, 400));
 
 makeThing(path_type, new THREE.Vector3(400, -100, -100));
 makeThing(path_type, new THREE.Vector3(400, -100, -200));
 makeThing(path_type, new THREE.Vector3(400, -100, -300));
 makeThing(path_type, new THREE.Vector3(400, -100, -400));
+makeTreesAndLinesBetween(new THREE.Vector3(470, -100, 0), new THREE.Vector3(470, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(330, -100, -400), new THREE.Vector3(330, -100, -400));
 
 makeThing(horizontal_path_type, new THREE.Vector3(500, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(600, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(700, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(800, -100, -400));
+makeTreesAndLinesBetween(new THREE.Vector3(400, -100, -470), new THREE.Vector3(800, -100, -470));
+makeTreesAndLinesBetween(new THREE.Vector3(400, -100, -330), new THREE.Vector3(800, -100, -330));
 
 makeThing(horizontal_path_type, new THREE.Vector3(900, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, -400));
 makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, -400));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, -470), new THREE.Vector3(1200, -100, -470));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, -330), new THREE.Vector3(1200, -100, -330));
 
 makeThing(horizontal_path_type, new THREE.Vector3(500, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(600, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(700, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(800, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(400, -100, 470), new THREE.Vector3(800, -100, 470));
+makeTreesAndLinesBetween(new THREE.Vector3(400, -100, 330), new THREE.Vector3(800, -100, 330));
 
 makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 400));
 makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, 470), new THREE.Vector3(1200, -100, 470));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, 330), new THREE.Vector3(1200, -100, 330));
 
 makeThing(path_type, new THREE.Vector3(800, -100, 500));
 makeThing(path_type, new THREE.Vector3(800, -100, 600));
 makeThing(path_type, new THREE.Vector3(800, -100, 700));
 makeThing(path_type, new THREE.Vector3(800, -100, 800));
+makeTreesAndLinesBetween(new THREE.Vector3(870, -100, 400), new THREE.Vector3(870, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(730, -100, 800), new THREE.Vector3(730, -100, 800));
 
 makeThing(path_type, new THREE.Vector3(800, -100, -500));
 makeThing(path_type, new THREE.Vector3(800, -100, -600));
 makeThing(path_type, new THREE.Vector3(800, -100, -700));
 makeThing(path_type, new THREE.Vector3(800, -100, -800));
+makeTreesAndLinesBetween(new THREE.Vector3(870, -100, -400), new THREE.Vector3(870, -100, -400));
+makeTreesAndLinesBetween(new THREE.Vector3(730, -100, -800), new THREE.Vector3(730, -100, -800));
 
 makeThing(path_type, new THREE.Vector3(800, -100, -300));
 makeThing(path_type, new THREE.Vector3(800, -100, -200));
 makeThing(path_type, new THREE.Vector3(800, -100, -100));
 makeThing(path_type, new THREE.Vector3(800, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(870, -100, 0), new THREE.Vector3(870, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(730, -100, 400), new THREE.Vector3(730, -100, 400));
 
 makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, -70), new THREE.Vector3(1200, -100, -70));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, 70), new THREE.Vector3(1200, -100, 70));
 
 makeThing(horizontal_path_type, new THREE.Vector3(900, -100, 800));
 makeThing(horizontal_path_type, new THREE.Vector3(1000, -100, 800));
 makeThing(horizontal_path_type, new THREE.Vector3(1100, -100, 800));
 makeThing(horizontal_path_type, new THREE.Vector3(1200, -100, 800));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, 870), new THREE.Vector3(1200, -100, 870));
+makeTreesAndLinesBetween(new THREE.Vector3(800, -100, 730), new THREE.Vector3(1200, -100, 730));
 
-makeThing(path_type, new THREE.Vector3(1200, -100, 300));
-makeThing(path_type, new THREE.Vector3(1200, -100, 200));
-makeThing(path_type, new THREE.Vector3(1200, -100, 100));
+makeThing(path_type, new THREE.Vector3(1200, -100, -300));
+makeThing(path_type, new THREE.Vector3(1200, -100, -200));
+makeThing(path_type, new THREE.Vector3(1200, -100, -100));
 makeThing(path_type, new THREE.Vector3(1200, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(1270, -100, 0), new THREE.Vector3(1270, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(1130, -100, -400), new THREE.Vector3(1130, -100, -400));
 
 makeThing(path_type, new THREE.Vector3(1200, -100, 100));
 makeThing(path_type, new THREE.Vector3(1200, -100, 200));
 makeThing(path_type, new THREE.Vector3(1200, -100, 300));
 makeThing(path_type, new THREE.Vector3(1200, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(1270, -100, 0), new THREE.Vector3(1270, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(1130, -100, 400), new THREE.Vector3(1130, -100, 400));
 
 makeThing(path_type, new THREE.Vector3(1200, -100, 500));
 makeThing(path_type, new THREE.Vector3(1200, -100, 600));
 makeThing(path_type, new THREE.Vector3(1200, -100, 700));
 makeThing(path_type, new THREE.Vector3(1200, -100, 800));
+makeTreesAndLinesBetween(new THREE.Vector3(1270, -100, 400), new THREE.Vector3(1270, -100, 400));
+makeTreesAndLinesBetween(new THREE.Vector3(1130, -100, 800), new THREE.Vector3(1130, -100, 800));
 
 makeThing(horizontal_path_type, new THREE.Vector3(1300, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1400, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
+makeTreesAndLinesBetween(new THREE.Vector3(1200, -100, -70), new THREE.Vector3(1600, -100, -70));
+makeTreesAndLinesBetween(new THREE.Vector3(1200, -100, 70), new THREE.Vector3(1600, -100, 70));
 
 var scene_type = 0;
 var console_type = 1;
@@ -1007,8 +1058,8 @@ function render() {
 		playerMadeMove = false;
 
 		// senpai will reset you
-		currentReserveX = reserveX;
-		currentReserveY = reserveY;
+		currentReserveX = map[playerPosition].x + reserveX;
+		currentReserveY = map[playerPosition].y + reserveY;
 
 		checkDisplayAndStuff();
 	}
