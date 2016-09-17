@@ -14,15 +14,11 @@ document.body.appendChild(renderer.domElement);
 camera.position.z = 5;
 
 var fontLoader = new THREE.FontLoader();
-fontLoader.load("http://threejs.org/examples/fonts/helvetiker_regular.typeface.json", function(font) {
-	init(font);
-	alert("!");
-});
 
 // class letter
 // parameter character must be of length 1
 // parameter font must be loaded font
-var letter = function(character, font) {
+var letter = function(character) {
 	this.text = character // the actual character
 	
 	this.objectID = -1 // the ID of the object (potentially) formed by this character
@@ -36,7 +32,7 @@ var letter = function(character, font) {
 	this.geometry = new THREE.TextGeometry(
 		this.text,
 		{
-			font: font,
+			font: "lm mono 10",
 			size: 100
 		}
 		);
@@ -50,10 +46,8 @@ letter.prototype.render = function(scene) {
 	scene.add(this.mesh);
 }
 
-function init(font) {
-	var l = new letter("t", font);
-	l.render(scene);
-}
+var l = new letter("t");
+l.render(scene);
 
 function render() {
 	requestAnimationFrame(render);
