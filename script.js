@@ -1,6 +1,16 @@
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
 
+
+var platform_geo, platform_material, platform_mesh;
+
+platform_geo = new THREE.BoxGeometry(200, 10, 100);
+platform_material = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: true});
+platform_mesh = new THREE.Mesh(platform_geo, platform_material);
+scene.add(platform_mesh);
+platform_mesh.position.set(0, -50, 50);
+
+
 var camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
@@ -37,6 +47,8 @@ var cameraDistance = 300;
 var cameraDir = 0;
 var cameraYRotation = 0;
 var cameraPosition = new THREE.Vector3(0, 0, cameraDistance);
+var rotationX = 0;
+var rotationY = 0;
 
 function cameraFollowsLeftTurn(nextPlayerPosition) {
 	console.log("l " + nextPlayerPosition);
@@ -152,9 +164,9 @@ var rightOkay = false;
 
 var map = [
 	new THREE.Vector3(0, 0, 0),
-	new THREE.Vector3(400, 0, 0),
-	new THREE.Vector3(400, 0, -400),
-	new THREE.Vector3(400, 0, 400)
+	new THREE.Vector3(40, 0, 0),
+	new THREE.Vector3(40, 0, -40),
+	new THREE.Vector3(40, 0, 40)
 ];
 var coordsMap = [
 	[0, 0],
@@ -175,7 +187,7 @@ var currentDirection = 0;
 var currentCoordX = 0;
 var currentCoordZ = 0;
 var playerPosition = 0;
-var visibility = 300;
+var visibility = 50;
 
 function makeThing(id, type, position) {
 	things.push(new thing(id, type, position));
@@ -183,7 +195,12 @@ function makeThing(id, type, position) {
 
 makeThing(player_type, new THREE.Vector3(0, 0, 0));
 makeThing(line_type, new THREE.Vector3(0, 0, -10));
-makeThing(line_type, new THREE.Vector3(400, 0, -10));
+makeThing(line_type, new THREE.Vector3(30, 0, -10));
+makeThing(line_type, new THREE.Vector3(30, 0, -40));
+
+makeThing(line_type, new THREE.Vector3(0, 0, 10));
+makeThing(line_type, new THREE.Vector3(30, 0, 10));
+makeThing(line_type, new THREE.Vector3(30, 0, 40));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -357,11 +374,14 @@ var playerMakingMove = false;
 var playerMadeMove = false;
 
 function checkDisplayAndStuff() {
-	var player = things[0]
+	var player = things[0];
 	for (var i = 1; i < things.length; i++) {
 		var t = things[i];
 		var dist = t.position.distanceTo(player.position);
-		if (dist < visibility) {
+		logvector(t.position, "t.p: ");
+		logvector(player.position, "p.p: ");
+		console.log(dist);
+		if (dist <= visibility) {
 			t.isDisplayed = true;
 
 			if (!encounters[t.type]) {
@@ -369,12 +389,15 @@ function checkDisplayAndStuff() {
 				addConsoleString(getIntroString(t.type));
 			}
 
+			console.log(t.ID + "; " + t.isFormed);
 			if (!t.isFormed) {
 				t.isFormed = true;
+				console.log("come on");
 				var numLetters = t.numLettersRequired;
 				var numLettersPerString = getFormerString(t.type).length;
 				var numStrings = Math.ceil(numLetters / numLettersPerString);
 				for (var x = 0; x < numStrings; x++) {
+					console.log("yea");
 					addReserveString(getFormerString(t.type), t.ID);
 				}
 			}
@@ -382,12 +405,14 @@ function checkDisplayAndStuff() {
 			t.isDisplayed = false;
 			if (t.isFormed) {
 				t.isFormed = false;
+				console.log(t.ID + ": " + t.isFormed);
 				for (var j = 0; j < sceneLetters.length; j++) {
 					var nl = sceneLetters[j];
 					if (nl.thingID == t.ID) {
 						nl.free();
 					}
 				}
+				t.numLettersFormed = 0;
 			}
 		}
 	}
@@ -442,7 +467,7 @@ function addConsoleString(s) {
 				if (nl.consoleLineIndex == 0) {
 					nl.free();
 				} else {
-					nl.destination.add(new THREE.Vector3(0, letterHeight, 0));
+					nl.destination.add(new THREE.Vector3(0, letterHeight * 1.3, 0));
 					nl.consoleLineIndex--;
 				}
 			}
@@ -467,7 +492,9 @@ function render() {
 	camera.position.x += (cameraPosition.x - camera.position.x) / 50;
 	camera.position.y += (cameraPosition.y - camera.position.y) / 50;
 	camera.position.z += (cameraPosition.z - camera.position.z) / 50;
-	camera.rotation.y += (cameraYRotation - camera.rotation.y) / 50;
+
+	camera.rotation.x += (rotationX - camera.rotation.x) / 50;
+	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 50;
 
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
@@ -542,21 +569,26 @@ function render() {
 				}
 
 				if (direction != -1) {
-					if ((direction - currentDirection) % 4 == 0) {
+					console.log(currentDirection + " .. " + direction + " -> " + x + ", " + z);
+					if ((direction - currentDirection + 4) % 4 == 0) {
 						forwardOkay = true;
 						addConsoleString("\nf: moves forward. ");
+						console.log("forward!");
 					}
-					else if ((direction - currentDirection) % 4 == 1) {
+					else if ((direction - currentDirection + 4) % 4 == 1) {
 						leftOkay = true;
 						addConsoleString("\nl: turns left. ");
+						console.log("left!");
 					}
-					else if ((direction - currentDirection) % 4 == 2) {
+					else if ((direction - currentDirection + 4) % 4 == 2) {
 						backOkay = true;
 						addConsoleString("\nb: goes back. ");
+						console.log("back!");
 					}
-					else if ((direction - currentDirection) % 4 == 3) {
+					else if ((direction - currentDirection + 4) % 4 == 3) {
 						rightOkay = true;
 						addConsoleString("\nr: turns right. ");
+						console.log("right!");
 					}
 				}
 			}
@@ -569,11 +601,21 @@ function render() {
 		playerReadyToMove = false;
 		playerMakingMove = false;
 		playerMadeMove = false;
+
+		// senpai will reset you
+		currentReserveX = reserveX;
+		currentReserveY = reserveY;
+
 		checkDisplayAndStuff();
 	}
 }
 
 render();
+
+$("body").on("mousemove", function(event) {
+	rotationY = -(event.pageX - window.innerWidth / 2) * 0.001;
+	rotationX = -(event.pageY - window.innerHeight / 2) * 0.001;
+});
 
 $("body").bind("keypress", function(event) {
 	if (event.which >= 97 && event.which <= 122) {
@@ -593,6 +635,8 @@ $("body").bind("keypress", function(event) {
 				playerMadeMove = true;
 
 				currentDirection += result;
+				currentDirection %= 4;
+
 				if (currentDirection % 4 == 0) {
 					currentCoordX++;
 				}
@@ -609,8 +653,19 @@ $("body").bind("keypress", function(event) {
 				playerPosition = getMapIndexFromCoords(currentCoordX, currentCoordZ);
 				console.log("get " + currentCoordX + ", " + currentCoordZ + " -> " + playerPosition);
 
-				if (result == 1) {
+				var movement = new THREE.Vector3();
+				movement.subVectors(map[playerPosition], things[0].position);
+
+				things[0].position.add(movement);
+
+				if (result == 0) {
+					cameraPosition.add(movement);
+				}
+				else if (result == 1) {
 					cameraFollowsLeftTurn(playerPosition);
+				}
+				else if (result == 2) {
+					cameraPosition.add(movement);
 				}
 				else if (result == 3) {
 					cameraFollowsRightTurn(playerPosition);
