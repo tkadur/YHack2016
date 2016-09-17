@@ -148,10 +148,10 @@ var thing = function(type, position) {
 
 	switch (this.type) {
 		case player_type:
-			this.numLettersRequired = 500;
+			this.numLettersRequired = 150;
 			this.isBlob = true;
 
-			for (var x = 0; x < 150; x++) {
+			for (var x = 0; x < 30; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 30 - 15,
@@ -162,7 +162,7 @@ var thing = function(type, position) {
 				this.positions.push(vec);
 			}
 
-			for (var x = 0; x < 350; x++) {
+			for (var x = 0; x < 120; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 105 - 40,
@@ -190,13 +190,13 @@ var thing = function(type, position) {
 			break;
 
 		case path_type:
-			this.numLettersRequired = 121;
+			this.numLettersRequired = 36;
 
 			var bottomLeftFront = new THREE.Vector3(this.position.x - 50, this.position.y - 5, this.position.z + 50);
 			var topRightBack = new THREE.Vector3(this.position.x + 50, this.position.y + 5, this.position.z - 50);
 
-			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 10) {
-				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 10) {
+			for (var x = bottomLeftFront.x; x <= topRightBack.x; x += 20) {
+				for (var z = bottomLeftFront.z; z >= topRightBack.z; z -= 20) {
 					this.positions.push(new THREE.Vector3(x, this.position.y - Math.random() * 10, z));
 				}
 			}
