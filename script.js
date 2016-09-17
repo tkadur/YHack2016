@@ -1,7 +1,6 @@
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
 
-
 var platform_geo, platform_material, platform_mesh;
 
 platform_geo = new THREE.BoxGeometry(200, 10, 100);
@@ -9,7 +8,6 @@ platform_material = new THREE.MeshLambertMaterial({color: 0x0000ff, wireframe: t
 platform_mesh = new THREE.Mesh(platform_geo, platform_material);
 scene.add(platform_mesh);
 platform_mesh.position.set(0, -50, 50);
-
 
 var camera = new THREE.PerspectiveCamera(
 	75,
@@ -93,13 +91,19 @@ var player_type = -1;
 var line_type = 0;
 
 function getIntroString(type) {
-	if (type == line_type) {
+	if (type == player_type) {
+		return "He was there the whole time. ";
+	}
+	else if (type == line_type) {
 		return "He comes across a line. ";
 	}
 }
 
 function getFormerString(type) {
-	if (type == line_type) {
+	if (type == player_type) {
+		return "**************************** ";
+	}
+	else if (type == line_type) {
 		return "The line is straight and finite. "
 	}
 }
@@ -124,16 +128,40 @@ var thing = function(type, position) {
 	this.isDisplayed = false;
 	this.isFormed = false;
 	this.position = position;
-
+	
 	this.numLettersRequired;
 	this.numLettersFormed = 0;
 	this.positions = [];
 
-	if (this.type == line_type) {
+	if (this.type == player_type) {
+		this.numLettersRequired = 500;
+		this.isBlob = true;
+
+		for (var x = 0; x < 150; x++) {
+			var vec = new THREE.Vector3(
+				Math.random() * 30 - 15,
+				Math.random() * 30 - 15,
+				Math.random() * 30 - 15
+				);
+			vec.setLength(15);
+			vec.add(new THREE.Vector3(0, 80, 0));
+			this.positions.push(vec);
+		}
+
+		for (var x = 0; x < 350; x++) {
+			var vec = new THREE.Vector3(
+				Math.random() * 30 - 15,
+				Math.random() * 105 - 40,
+				Math.random() * 30 - 15
+				);
+			this.positions.push(vec);
+		}
+	}
+	else if (this.type == line_type) {
 		this.numLettersRequired = 50;
 
 		var bottom = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
-		var top = new THREE.Vector3(this.position.x, this.position.y - 100, this.position.z);
+		var top = new THREE.Vector3(this.position.x, this.position.y + 200, this.position.z);
 
 		var total = (this.numLettersRequired - 1);
 		for (var x = 0; x <= total; x++) {
@@ -144,6 +172,37 @@ var thing = function(type, position) {
 			));
 		}
 		shuffle(this.positions);
+	}
+}
+
+thing.prototype.assignNewDestination = function() {
+	if (!this.isBlob) {
+		return;
+	}
+
+	if (this.type == player_type) {
+		var r = Math.floor(Math.random() * 50);
+		if (r == 0) {
+			var vec = new THREE.Vector3(
+				Math.random() * 30 - 15,
+				Math.random() * 30 - 15,
+				Math.random() * 30 - 15
+				);
+			vec.setLength(15);
+			vec.add(new THREE.Vector3(0, 80, 0));
+			vec.add(this.position);
+			return vec;
+		} else {
+			var vec = new THREE.Vector3(
+				Math.random() * 30 - 15,
+				Math.random() * 105 - 40,
+				Math.random() * 30 - 15
+				);
+			vec.x *= Math.cos(((vec.y + 40) / 75) * Math.PI / 2);
+			vec.z *= Math.cos(((vec.y + 40) / 75) * Math.PI / 2);
+			vec.add(this.position);
+			return vec;
+		}
 	}
 }
 
@@ -163,10 +222,10 @@ var backOkay = false;
 var rightOkay = false;
 
 var map = [
-	new THREE.Vector3(0, 0, 0),
-	new THREE.Vector3(40, 0, 0),
-	new THREE.Vector3(40, 0, -40),
-	new THREE.Vector3(40, 0, 40)
+	new THREE.Vector3(0, -40, 0),
+	new THREE.Vector3(400, -40, 0),
+	new THREE.Vector3(400, -40, -400),
+	new THREE.Vector3(400, -40, 400)
 ];
 var coordsMap = [
 	[0, 0],
@@ -187,20 +246,20 @@ var currentDirection = 0;
 var currentCoordX = 0;
 var currentCoordZ = 0;
 var playerPosition = 0;
-var visibility = 50;
+var visibility = 300;
 
 function makeThing(id, type, position) {
 	things.push(new thing(id, type, position));
 }
 
-makeThing(player_type, new THREE.Vector3(0, 0, 0));
-makeThing(line_type, new THREE.Vector3(0, 0, -10));
-makeThing(line_type, new THREE.Vector3(30, 0, -10));
-makeThing(line_type, new THREE.Vector3(30, 0, -40));
+makeThing(player_type, new THREE.Vector3(0, -40, 0));
+makeThing(line_type, new THREE.Vector3(0, -40, -100));
+makeThing(line_type, new THREE.Vector3(300, -40, -100));
+makeThing(line_type, new THREE.Vector3(300, -40, -400));
 
-makeThing(line_type, new THREE.Vector3(0, 0, 10));
-makeThing(line_type, new THREE.Vector3(30, 0, 10));
-makeThing(line_type, new THREE.Vector3(30, 0, 40));
+makeThing(line_type, new THREE.Vector3(0, -40, 100));
+makeThing(line_type, new THREE.Vector3(300, -40, 100));
+makeThing(line_type, new THREE.Vector3(300, -40, 400));
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -242,7 +301,7 @@ var letter = function(type, character, font) {
 
 	this.width = 0;
 
-	this.randomFactor = Math.random() - 0.5
+	this.randomFactor = Math.random() - 0.5;
 
 	// console letters
 	this.consoleTickElapsed = 0;
@@ -251,6 +310,7 @@ var letter = function(type, character, font) {
 	// scene letters
 	this.sceneTick = 0;
 	this.sceneTickToForm = 100;
+	this.sceneArrived = false;
 }
 
 letter.prototype.calculateWidth = function() {
@@ -317,6 +377,10 @@ letter.prototype.update = function() {
 
 			if (this.sceneTickToForm <= 0) {
 				this.mesh.rotation.y = this.sceneTick * this.randomFactor * 0.01;
+
+				if (this.mesh.position.distanceTo(this.destination) < 2) {
+					this.sceneArrived = true;
+				}
 			}
 		}
 	}
@@ -339,6 +403,7 @@ var currentReserveY = reserveY;
 var reserveWidth = 150;
 
 function addReserveString(s, id) {
+	console.log(id);
 	for (var i = 0; i < s.length; i++) {
 		var l = new letter(scene_type, s[i], font);
 		l.thingID = id;
@@ -375,13 +440,10 @@ var playerMadeMove = false;
 
 function checkDisplayAndStuff() {
 	var player = things[0];
-	for (var i = 1; i < things.length; i++) {
+	for (var i = 0; i < things.length; i++) {
 		var t = things[i];
 		var dist = t.position.distanceTo(player.position);
-		logvector(t.position, "t.p: ");
-		logvector(player.position, "p.p: ");
-		console.log(dist);
-		if (dist <= visibility) {
+		if (i == 0 || dist <= visibility) {
 			t.isDisplayed = true;
 
 			if (!encounters[t.type]) {
@@ -389,15 +451,12 @@ function checkDisplayAndStuff() {
 				addConsoleString(getIntroString(t.type));
 			}
 
-			console.log(t.ID + "; " + t.isFormed);
 			if (!t.isFormed) {
 				t.isFormed = true;
-				console.log("come on");
 				var numLetters = t.numLettersRequired;
 				var numLettersPerString = getFormerString(t.type).length;
 				var numStrings = Math.ceil(numLetters / numLettersPerString);
 				for (var x = 0; x < numStrings; x++) {
-					console.log("yea");
 					addReserveString(getFormerString(t.type), t.ID);
 				}
 			}
@@ -405,7 +464,6 @@ function checkDisplayAndStuff() {
 			t.isDisplayed = false;
 			if (t.isFormed) {
 				t.isFormed = false;
-				console.log(t.ID + ": " + t.isFormed);
 				for (var j = 0; j < sceneLetters.length; j++) {
 					var nl = sceneLetters[j];
 					if (nl.thingID == t.ID) {
@@ -527,6 +585,15 @@ function render() {
 			} else {
 				l.free();
 			}
+		} else {
+			if (l.sceneArrived) {
+				var t = things[l.thingID];
+				if (t.isBlob) {
+					var newDest = t.assignNewDestination();
+					l.setDestination(newDest.x, newDest.y, newDest.z);
+					l.sceneArrived = false;
+				}
+			}
 		}
 		l.update();
 	}
@@ -569,26 +636,21 @@ function render() {
 				}
 
 				if (direction != -1) {
-					console.log(currentDirection + " .. " + direction + " -> " + x + ", " + z);
 					if ((direction - currentDirection + 4) % 4 == 0) {
 						forwardOkay = true;
 						addConsoleString("\nf: moves forward. ");
-						console.log("forward!");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 1) {
 						leftOkay = true;
 						addConsoleString("\nl: turns left. ");
-						console.log("left!");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 2) {
 						backOkay = true;
 						addConsoleString("\nb: goes back. ");
-						console.log("back!");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 3) {
 						rightOkay = true;
 						addConsoleString("\nr: turns right. ");
-						console.log("right!");
 					}
 				}
 			}
@@ -651,7 +713,6 @@ $("body").bind("keypress", function(event) {
 				}
 
 				playerPosition = getMapIndexFromCoords(currentCoordX, currentCoordZ);
-				console.log("get " + currentCoordX + ", " + currentCoordZ + " -> " + playerPosition);
 
 				var movement = new THREE.Vector3();
 				movement.subVectors(map[playerPosition], things[0].position);
