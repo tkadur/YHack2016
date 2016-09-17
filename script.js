@@ -16,6 +16,7 @@ camera.position.z = 5;
 var fontLoader = new THREE.FontLoader();
 fontLoader.load("fonts/helvetiker_regular.typeface.json", function(font) {
 	init(font);
+	alert("!");
 });
 
 // class letter
