@@ -575,11 +575,11 @@ var console_type = 1;
 // class letter
 // parameter character must be of length 1
 // parameter font must be loaded font
-var letter = function(type, character, font, thingID) {
+var letter = function(type, character, font) {
 	this.type = type;
 	this.text = character; // the actual character
 
-	this.thingID = thingID; // the ID of the thing (potentially) formed by this character
+	this.thingID = -1; // the ID of the thing (potentially) formed by this character
 
 	this.position = new THREE.Vector3(0, 0, 0);
 	this.velocity = new THREE.Vector3(0, 0, 0);
@@ -728,6 +728,7 @@ var reserveWidth = 150;
 function addReserveString(s, id) {
 	for (var i = 0; i < s.length; i++) {
 		var l = new letter(scene_type, s[i], font);
+		l.thingID = id;
 		l.setDestination(currentReserveX, currentReserveY, 0);
 		l.setPosition(currentReserveX, currentReserveY - 20 - Math.random() * 5, 0);
 
@@ -800,7 +801,7 @@ function checkDisplayAndStuff() {
 }
 
 function init(font) {
-	var l = new letter(console_type, "a", font, id);
+	var l = new letter(console_type, "a", font);
 	l.calculateWidth();
 	letterWidth = l.width;
 
