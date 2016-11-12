@@ -220,12 +220,12 @@ var thing = function(type, position) {
 	this.positions = [];
 	this.colors = [];
 
-	switch (this.type) {
-		case player_type:
+	//switch (this.type) {
+	//	case player_type:
 			this.numLettersRequired = 300;
 			this.isBlob = true;
-
-			for (var x = 0; x < 100; x++) {
+			/*
+			for (var x = 0; x < 300; x++) {
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 30 - 15,
@@ -240,8 +240,9 @@ var thing = function(type, position) {
 					this.colors.push(0x000022);
 				}
 			}
+			
 
-			for (var x = 0; x < 200; x++) {
+			for (var x = 0; x < 300; x++) { //Changes how much of the text gets transferred into blob
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 105 - 40,
@@ -254,8 +255,10 @@ var thing = function(type, position) {
 					this.colors.push(0x000055);
 				}
 			}
+			
 			break;
-
+			*/
+		/*
 		case line_type:
 			this.numLettersRequired = 30;
 
@@ -385,7 +388,9 @@ var thing = function(type, position) {
 				this.numLettersRequired += numNodesOnBranch;
 			}
 			break;
+		
 	}
+	*/
 }
 
 thing.prototype.assignNewDestination = function() {
@@ -402,13 +407,13 @@ thing.prototype.assignNewDestination = function() {
 				Math.random() * 30 - 15
 				);
 			vec.setLength(15);
-			vec.add(new THREE.Vector3(0, 80, 0));
+			vec.add(new THREE.Vector3(1500, 0, 150)); //Controls the vector for the small number of stuff that goes randomly (x,y,z)
 			vec.add(this.position);
 			return vec;
 		} else {
 			var vec = new THREE.Vector3(
+				Math.random() * 105 - 40, //Main vector for the big chunk of text to go back and forth (x,y,z)
 				Math.random() * 30 - 15,
-				Math.random() * 105 - 40, 
 				Math.random() * 30 - 15
 				);
 			vec.x *= Math.cos(((vec.y + 40) / 75) * Math.PI / 2);
