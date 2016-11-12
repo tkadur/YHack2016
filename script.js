@@ -402,13 +402,13 @@ thing.prototype.assignNewDestination = function() {
 				Math.random() * 30 - 15
 				);
 			vec.setLength(15);
-			vec.add(new THREE.Vector3(0, 80, 0));
+			vec.add(new THREE.Vector3(1500, 0, 150)); //Controls the vector for the small number of stuff that goes randomly (x,y,z)
 			vec.add(this.position);
 			return vec;
 		} else {
 			var vec = new THREE.Vector3(
+				Math.random() * 105 - 40, //Main vector for the big chunk of text to go back and forth (x,y,z)
 				Math.random() * 30 - 15,
-				Math.random() * 105 - 40,
 				Math.random() * 30 - 15
 				);
 			vec.x *= Math.cos(((vec.y + 40) / 75) * Math.PI / 2);
