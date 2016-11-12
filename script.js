@@ -89,7 +89,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 	/*
 	for (var iter = 0; iter < 7; iter++) {
 		var alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-		var char = alphabets[Math.floor(Math.random() * 52)];
+		var char = ""; //alphabets[Math.floor(Math.random() * 52)];
 		var giantAlphabetGeometry = new THREE.TextGeometry(char, {
 			font: font,
 			size: 100 + Math.random() * 10,
