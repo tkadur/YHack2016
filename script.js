@@ -408,7 +408,7 @@ thing.prototype.assignNewDestination = function() {
 		} else {
 			var vec = new THREE.Vector3(
 				Math.random() * 30 - 15,
-				Math.random() * 105 - 40,
+				Math.random() * 105 - 40, 
 				Math.random() * 30 - 15
 				);
 			vec.x *= Math.cos(((vec.y + 40) / 75) * Math.PI / 2);
@@ -423,7 +423,7 @@ thing.prototype.assignNewDestination = function() {
 // 1 = north
 // 2 = west
 // 3 = south
-
+/*
 var eastOkay = false;
 var northOkay = false;
 var westOkay = false;
@@ -433,6 +433,7 @@ var forwardOkay = false;
 var leftOkay = false;
 var backOkay = false;
 var rightOkay = false;
+
 
 var map = [
 	new THREE.Vector3(0, -40, 0),
@@ -466,6 +467,8 @@ var coordsMap = [
 	[3, 1],
 	[4, 0]
 ];
+
+
 
 function getMapIndexFromCoords(x, z) {
 	for (var i = 0; i < coordsMap.length; i++) {
@@ -502,7 +505,7 @@ function makeTreesAndLinesBetween(v1, v2) {
 			));
 	}
 }
-
+*/
 function makeThing(type, position) {
 	things.push(new thing(type, position));
 }
@@ -796,6 +799,7 @@ function addReserveString(s, id) {
 	}
 }
 
+/*
 var consoleX = 100;
 var consoleY = -100;
 var currentConsoleX = consoleX;
@@ -806,14 +810,15 @@ var consoleHeight = -200;
 var letterSpacing = 0.275;
 var letterWidth = 0;
 
+
 var gameOver = false;
 var playerReadyToMove = false;
 var playerMakingMove = false;
 var playerMadeMove = false;
+*/
 
 function checkDisplayAndStuff() {
 	var player = things[0];
-	console.log(things.toString());
 	
 	for (var i = 0; i < things.length; i++) {
 		var t = things[i];
@@ -1086,7 +1091,7 @@ function render() {
 
 		checkDisplayAndStuff();
 	}
-	*/
+	
 
 	if (currentCoordX == 4 && currentCoordZ == 0) {
 		if (!platformAdded) {
@@ -1099,7 +1104,7 @@ function render() {
 			}
 			else {
 				platform_mesh.position.set(1600, -100, 0);
-				/*
+				
 				if (!arriveMsg) {
 					addConsoleString("\n ");
 					addConsoleString("\n... ");
@@ -1107,7 +1112,7 @@ function render() {
 					addConsoleString("\nThe player arrives. ");
 					arriveMsg = true;
 				}
-				*/
+				
 			}
 			platform_mesh.rotation.y += .01;
 		}
@@ -1118,6 +1123,7 @@ function render() {
 	for (var i = 0; i < arrayOfAlphabets.length; i++) {
 		arrayOfAlphabets[i].rotation.y += .02;
 	}
+	*/
 
 }
 
