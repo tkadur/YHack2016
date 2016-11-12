@@ -86,7 +86,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 	font = response;
 	makeTextGeometries(font);
 	init(font);
-
+	/*
 	for (var iter = 0; iter < 7; iter++) {
 		var alphabets = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		var char = alphabets[Math.floor(Math.random() * 52)];
@@ -104,10 +104,11 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 		scene.add(giantAlphabetMesh);
 		arrayOfAlphabets.push(giantAlphabetMesh);
 	}
+	*/
 });
 
 var smallTextGeometries = [];
-var largeTextGeometries = [];
+//var largeTextGeometries = [];
 
 var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *:"
 
@@ -126,6 +127,7 @@ function makeTextGeometries(font) {
 			);
 		smallTextGeometries.push(smallGeometry);
 
+		/*
 		var largeGeometry = new THREE.TextGeometry(
 			allString[i],
 			{
@@ -135,6 +137,7 @@ function makeTextGeometries(font) {
 			}
 			);
 		largeTextGeometries.push(largeGeometry);
+		*/
 	}
 }
 
@@ -145,12 +148,14 @@ function getSmallTextGeometry(character) {
 	}
 }
 
+/*
 function getLargeTextGeometry(character) {
 	var index = allString.indexOf(character);
 	if (character != -1) {
 		return largeTextGeometries[index];
 	}
 }
+*/
 
 // thing types
 var player_type = -1;
@@ -666,15 +671,15 @@ var letter = function(type, character, font) {
 	this.isDead = false;
 
 	this.geometry;
-	if (this.type == scene_type) {
+	//if (this.type == scene_type) {
 		this.geometry = getSmallTextGeometry(this.text);
-	}
+	//}
 	/* else if (this.type == alphabet_type) {
 		this.geometry = getRandomGiantTextGeometry(this.text);
-	} */
+	}
 	else {
 		this.geometry = getLargeTextGeometry(this.text);
-	}
+	}*/
 	this.material = new THREE.MeshBasicMaterial({
 		color: 0x000000,
 		transparent: true,
@@ -825,6 +830,8 @@ var playerMadeMove = false;
 
 function checkDisplayAndStuff() {
 	var player = things[0];
+	console.log(things.toString());
+	
 	for (var i = 0; i < things.length; i++) {
 		var t = things[i];
 		var dist = t.position.distanceToSquared(player.position);
@@ -859,7 +866,7 @@ function checkDisplayAndStuff() {
 			}
 		}
 	}
-
+	
 	playerReadyToMove = true;
 }
 
@@ -932,13 +939,16 @@ function render() {
 	renderer.render(scene, camera);
 
 	tick++;
+	
+	/*
 	camera.position.x += (cameraPosition.x - camera.position.x) / 50;
 	camera.position.y += (cameraPosition.y - camera.position.y) / 50;
 	camera.position.z += (cameraPosition.z - camera.position.z) / 50;
+	*/
 
 	camera.rotation.x += (rotationX - camera.rotation.x) / 20;
 	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 20;
-
+	
 	/*
 	for (var iter = 0; iter < 1; iter++) {
 		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
