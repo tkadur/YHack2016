@@ -413,6 +413,8 @@ var reserveY = 100;
 var currentReserveX = reserveX;
 var currentReserveY = reserveY;
 var reserveWidth = 150;
+var globalChanger = false;
+var globalCounter = 0;
 
 function addReserveString(s, id) {
 	for (var i = 0; i < s.length; i++) {
@@ -641,6 +643,25 @@ function render() {
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
+		}
+		//Creates spike and disperses after a certain number of cycles
+		var vect =  l.position;
+		var lowerBoundX = -100; //Hardcoded rectangular bounds for spike
+		var higherBoundX = -50;
+		var lowerBoundZ = -100;
+		var higherBoundZ = -50;
+		if ((vect.x>lowerBoundX) && (vect.x<higherBoundX) &&
+		         (vect.z>lowerBoundZ) && (vect.z<higherBoundZ) &&
+		         globalChanger)
+		{
+			var midX = (lowerBoundX+higherBoundX)/2;
+			var midZ = (lowerBoundZ+higherBoundZ)/2;
+			l.setDestination(midX,10,midZ);
+			globalCounter+=1;
+			if (globalCounter>3000){
+				globalCounter = 0;
+				globalChanger = false;
+			}
 		} else if (l.sceneArrived) {
 			var t = things[l.thingID];
 			if (t.isBlob) {
@@ -669,5 +690,7 @@ $("body").bind("keypress", function(event) {
  		targetStr = "Pen Pineapple Apple Pen";
  	} else if (event.which == 99) {		
  		targetStr = "Lucy pls";
+ 	} else if (event.which >= 32){ //Press Space to see spike
+ 		globalChanger = !globalChanger;
  	}
  })
