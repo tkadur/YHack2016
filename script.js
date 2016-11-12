@@ -241,7 +241,7 @@ var thing = function(type, position) {
 				}
 			}
 
-			for (var x = 0; x < 200; x++) {
+			for (var x = 0; x < 5; x++) { //Changes how much of the text gets transferred into blob
 				var vec = new THREE.Vector3(
 					Math.random() * 30 - 15,
 					Math.random() * 105 - 40,
