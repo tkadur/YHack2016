@@ -558,7 +558,9 @@ function render() {
 	}
 	
 	var camVector = new THREE.Vector3( 0, 0, - 1 );
-	camVector.applyQuaternion( camera.quaternion );
+	//camVector.applyQuaternion( camera.quaternion );
+
+	camera.getWorldDirection(camVector);
 
 	for (var iter = 0; iter < 1; iter++) {
 		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
@@ -631,14 +633,18 @@ function render() {
 			if (t.isBlob) {
 				target.shift();
 				counter++;
-				console.log(target.toString());
-				l.setDestination( - (4 * counter) + (targetStr.length / 2), 0, 75);
+				//console.log(target.toString());
+				var extra = (targetStr.length * 4 / 2)- (4 * counter)
+				l.setDestination(camVector.x * 75 + extra, camVector.y * 75, camVector.z * 75);
+				//l.mesh.lookAt(new THREE.Vector3(l.mesh.x, l.mesh.y, l.mesh.z));
+				//console.log(camVector);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
 		} else if (l.sceneArrived) {
 			var t = things[l.thingID];
 			if (t.isBlob) {
+				l.randomFactor = Math.random() - 0.5;
 				var newDest = t.assignNewDestination();
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 				l.sceneArrived = false;
@@ -652,16 +658,16 @@ function render() {
 render();
 
 $("body").on("mousemove", function(event) {
-	rotationY = -(event.pageX - window.innerWidth / 2) * 0.005;
-	rotationX = -(event.pageY - window.innerHeight / 2) * 0.005;
+	rotationY = -(event.pageX - window.innerWidth / 2) * 0.01;
+	rotationX = -(event.pageY - window.innerHeight / 2) * 0.01;
 });
 
 $("body").bind("keypress", function(event) {		
  	if (event.which == 97) {		
- 		targetStr = "Phenylpropylaminopentane"
- 	} else if (event.which >= 98) {		
- 		targetStr = "Pen Pineapple Apple Pen"
- 	} else if (event.which >= 99) {		
- 		targetStr = "Lucy pls"
+ 		targetStr = "Phenylpropylaminopentane";
+ 	} else if (event.which == 98) {		
+ 		targetStr = "Pen Pineapple Apple Pen";
+ 	} else if (event.which == 99) {		
+ 		targetStr = "Lucy pls";
  	}
  })
