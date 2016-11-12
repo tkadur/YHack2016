@@ -636,9 +636,13 @@ function render() {
 				target.shift();
 				counter++;
 				//console.log(target.toString());
-				var extra = (targetStr.length * 4 / 2)- (4 * counter)
-				l.setDestination(camVector.x * 75 + extra, camVector.y * 75, camVector.z * 75);
-				//l.mesh.lookAt(new THREE.Vector3(l.mesh.x, l.mesh.y, l.mesh.z));
+				var extra = (targetStr.length * 3 / 2) - (3 * counter)
+
+				var targetVector = new THREE.Vector3(camVector.x * 75 + extra * Math.PI / 180, camVector.y * 75, camVector.z * 75 + extra * Math.PI / 180);
+				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180);
+
+				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
+				l.mesh.rotation = new THREE.Vector3(targetVector.x, targetVector.y, targetVector.z);
 				//console.log(camVector);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
@@ -690,7 +694,7 @@ $("body").bind("keypress", function(event) {
  		targetStr = "Pen Pineapple Apple Pen";
  	} else if (event.which == 99) {		
  		targetStr = "Lucy pls";
- 	} else if (event.which >= 32){ //Press Space to see spike
+ 	} else if (event.which == 100){ //Press Space to see spike
  		globalChanger = !globalChanger;
  	}
  })
