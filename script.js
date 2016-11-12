@@ -642,8 +642,8 @@ function render() {
 				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180);
 
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
-				l.mesh.rotation = new THREE.Vector3(targetVector.x, targetVector.y, targetVector.z);
-				//console.log(camVector);
+				l.mesh.rotation.y = 0;
+				console.log(l.mesh.rotation);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
