@@ -7,7 +7,7 @@ var platformAdded = false;
 var arriveMsg = false;
 
 platform_geo = new THREE.BoxGeometry(100, 10, 100);
-platform_material = new THREE.MeshBasicMaterial({color: 0xadd8e6});
+//platform_material = new THREE.MeshBasicMaterial({color: 0xadd8e6});
 platform_mesh = new THREE.Mesh(platform_geo, platform_material);
 
 platform_mesh.position.set(1600, -150, 0);
@@ -50,7 +50,7 @@ var cameraYRotation = 0;
 var cameraPosition = new THREE.Vector3(0, 0, cameraDistance);
 var rotationX = 0;
 var rotationY = 0;
-
+/*
 function cameraFollowsLeftTurn(nextPlayerPosition) {
 	cameraDir++;
 
@@ -74,7 +74,7 @@ function cameraFollowsRightTurn(nextPlayerPosition) {
 		Math.cos(cameraYRotation) * cameraDistance
 		));
 }
-
+*/
 camera.position.z = cameraDistance;
 consoleCamera.position.z = cameraDistance;
 
@@ -186,7 +186,7 @@ function getIntroString(type) {
 function getFormerString(type) {
 	switch (type) {
 		case player_type:
-			return "**************************** ";
+			return allString;
 			break;
 		case line_type:
 			return "The line is straight and finite. ";
@@ -529,7 +529,7 @@ for (var iter = 0; iter < 10; iter++) {
 	makeThing(tree_type, new THREE.Vector3(Math.random() * 1600, -100, Math.random() * 1600 - 800));
 }
 */
-
+/*
 makeThing(path_type, new THREE.Vector3(0, -100, 0));
 
 makeThing(horizontal_path_type, new THREE.Vector3(100, -100, 0));
@@ -643,6 +643,7 @@ makeThing(horizontal_path_type, new THREE.Vector3(1500, -100, 0));
 makeThing(horizontal_path_type, new THREE.Vector3(1600, -100, 0));
 makeTreesAndLinesBetween(new THREE.Vector3(1200, -100, -70), new THREE.Vector3(1600, -100, -70));
 makeTreesAndLinesBetween(new THREE.Vector3(1200, -100, 70), new THREE.Vector3(1600, -100, 70));
+*/
 
 var scene_type = 0;
 var console_type = 1;
@@ -694,8 +695,10 @@ var letter = function(type, character, font) {
 	this.sceneTickToForm = 100;
 	this.sceneArrived = false;
 
+	
 	// snowflakes
-	this.isSnowflake = false;
+	//this.isSnowflake = false;
+	
 }
 
 letter.prototype.calculateWidth = function() {
@@ -830,7 +833,7 @@ function checkDisplayAndStuff() {
 
 			if (!encounters[t.type]) {
 				encounters[t.type] = true;
-				addConsoleString(getIntroString(t.type));
+				//addConsoleString(getIntroString(t.type));
 			}
 
 			if (!t.isFormed) {
@@ -936,10 +939,11 @@ function render() {
 	camera.rotation.x += (rotationX - camera.rotation.x) / 20;
 	camera.rotation.y += ((cameraYRotation + rotationY) - camera.rotation.y) / 20;
 
+	/*
 	for (var iter = 0; iter < 1; iter++) {
 		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
 		flake.isSnowflake = true;
-		flake.setPosition(Math.random() * 1600, 300, Math.random() * 1600 - 800);
+		flake.setPosition(Math.random() * 1600, 300, Math.random() * 1600 - 800;
 		flake.setDestination(flake.position.x + Math.random() * 100 - 50, -200, flake.position.z + Math.random() * 100 - 50);
 		flake.speed = 2;
 
@@ -959,6 +963,7 @@ function render() {
 		scene.add(flake.mesh);
 		consoleLetters.push(flake);
 	}
+	*/
 
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
@@ -966,9 +971,12 @@ function render() {
 			scene.remove(l.mesh);
 			consoleLetters.splice(i, 1);
 		}
+		/*
 		if (l.isSnowflake && l.position.y < -100) {
 			l.free();
 		}
+		*/
+		
 		l.update();
 	}
 
@@ -1011,7 +1019,7 @@ function render() {
 
 	if (playerReadyToMove) {
 		if (!playerMakingMove) {
-			addConsoleString("\nThe player...\n");
+			//addConsoleString("\nThe player...\n");
 
 			eastOkay = false;
 			northOkay = false;
@@ -1049,19 +1057,19 @@ function render() {
 				if (direction != -1) {
 					if ((direction - currentDirection + 4) % 4 == 0) {
 						forwardOkay = true;
-						addConsoleString("f: moves forward.\n");
+						//addConsoleString("f: moves forward.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 1) {
 						leftOkay = true;
-						addConsoleString("l: turns left.\n");
+						//addConsoleString("l: turns left.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 2) {
 						backOkay = true;
-						addConsoleString("b: goes back.\n");
+						//addConsoleString("b: goes back.\n");
 					}
 					else if ((direction - currentDirection + 4) % 4 == 3) {
 						rightOkay = true;
-						addConsoleString("r: turns right.\n");
+						//addConsoleString("r: turns right.\n");
 					}
 				}
 			}
@@ -1093,6 +1101,7 @@ function render() {
 			}
 			else {
 				platform_mesh.position.set(1600, -100, 0);
+				/*
 				if (!arriveMsg) {
 					addConsoleString("\n ");
 					addConsoleString("\n... ");
@@ -1100,6 +1109,7 @@ function render() {
 					addConsoleString("\nThe player arrives. ");
 					arriveMsg = true;
 				}
+				*/
 			}
 			platform_mesh.rotation.y += .01;
 		}
@@ -1115,11 +1125,13 @@ function render() {
 
 render();
 
+// TODO bind to gyro
 $("body").on("mousemove", function(event) {
 	rotationY = -(event.pageX - window.innerWidth / 2) * 0.001;
 	rotationX = -(event.pageY - window.innerHeight / 2) * 0.001;
 });
 
+/*
 $("body").bind("keypress", function(event) {
 	if (event.which >= 97 && event.which <= 122) {
 		result = -3;
@@ -1178,3 +1190,4 @@ $("body").bind("keypress", function(event) {
 		addConsoleString("abcdefhiijidjsfkl");
 	}
 })
+*/
