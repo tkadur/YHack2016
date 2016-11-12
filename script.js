@@ -293,6 +293,9 @@ var letter = function(type, character, font) {
 	this.geometry;
 	this.geometry = getSmallTextGeometry(this.text);
 
+	this.waving = false;
+	this.wave = 0;
+
 	this.material = new THREE.MeshBasicMaterial({
 		color: 0x000000,
 		transparent: true,
@@ -413,8 +416,9 @@ var reserveY = 100;
 var currentReserveX = reserveX;
 var currentReserveY = reserveY;
 var reserveWidth = 150;
-var globalChanger = false;
-var globalCounter = 0;
+var spikeBool = false;
+var spikeCounter = 0;
+var smallNoiseBool = false;
 
 function addReserveString(s, id) {
 	for (var i = 0; i < s.length; i++) {
@@ -650,21 +654,37 @@ function render() {
 		}
 		//Creates spike and disperses after a certain number of cycles
 		var vect =  l.position;
+		currentDirect = l.destination;
 		var lowerBoundX = -100; //Hardcoded rectangular bounds for spike
 		var higherBoundX = -50;
 		var lowerBoundZ = -100;
 		var higherBoundZ = -50;
 		if ((vect.x>lowerBoundX) && (vect.x<higherBoundX) &&
 		         (vect.z>lowerBoundZ) && (vect.z<higherBoundZ) &&
-		         globalChanger)
+		         spikeBool)
 		{
 			var midX = (lowerBoundX+higherBoundX)/2;
 			var midZ = (lowerBoundZ+higherBoundZ)/2;
 			l.setDestination(midX,10,midZ);
-			globalCounter+=1;
-			if (globalCounter>3000){
-				globalCounter = 0;
-				globalChanger = false;
+			spikeCounter+=1;
+			if (spikeCounter>3000){
+				spikeCounter = 0;
+				spikeBool = false;
+			}
+		}
+		var offset = 100; //Slightly wider bound
+		//Continously creates waves until pressed again...letters however disperse after cycle counter
+		if (((vect.x>lowerBoundX-offset) && (vect.x<higherBoundX+offset) &&
+		    (vect.z>lowerBoundZ-offset) && (vect.z<higherBoundZ+offset) &&
+		         smallNoiseBool) || l.waving)
+		{ //Wave generator
+			l.setDestination(vect.x+10,vect.y+20*Math.cos(l.wave),currentDirect.z);
+			l.wave+=Math.PI/50;
+			l.waveCounter+=1;
+			//console.log("Testing sin wave");
+			if (l.waveCounter>1000){
+				l.waveCounter = 0;
+				l.waving = false;
 			}
 		} else if (l.sceneArrived) {
 			var t = things[l.thingID];
@@ -694,7 +714,10 @@ $("body").bind("keypress", function(event) {
  		targetStr = "Pen Pineapple Apple Pen";
  	} else if (event.which == 99) {		
  		targetStr = "Lucy pls";
- 	} else if (event.which == 100){ //Press Space to see spike
- 		globalChanger = !globalChanger;
+ 	} else if (event.which == 32){ //Press Space to see spike
+ 		spikeBool = !spikeBool;
+ 	}  else if (event.which == 122){
+ 		console.log("Z key Pressed");
+ 		smallNoiseBool = !smallNoiseBool;
  	}
  })
