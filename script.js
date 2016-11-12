@@ -159,12 +159,14 @@ function getLargeTextGeometry(character) {
 
 // thing types
 var player_type = -1;
+/*
 var line_type = 0;
 var path_type = 1;
 var horizontal_path_type = 1.5;
 var tree_type = 2;
 var alphabet_type = 3;
-
+*/
+/*
 function getIntroString(type) {
 	switch (type) {
 		case player_type:
@@ -186,29 +188,10 @@ function getIntroString(type) {
 			return "He perceives that this space is filled with alphabets. ";
 			break;
 	}
-}
+}*/
 
 function getFormerString(type) {
-	switch (type) {
-		case player_type:
-			return allString;
-			break;
-		case line_type:
-			return "The line is straight and finite. ";
-			break;
-		case path_type:
-			return "A segment of a path is inseparable from the path. "
-			break;
-		case tree_type:
-			return "Lining along the paths, the trees appear brittle under the covering snow. ";
-			break;
-		case horizontal_path_type:
-			return "A segment of a path is inseparable from THE path... "
-			break;
-		case alphabet_type:
-			return "A giant alphabet floats. "
-			break;
-	}
+	return allString
 }
 
 var things = [];
@@ -1027,6 +1010,8 @@ function render() {
 		l.update();
 	}
 
+	/*
+
 	if (playerReadyToMove) {
 		if (!playerMakingMove) {
 			//addConsoleString("\nThe player...\n");
@@ -1087,7 +1072,9 @@ function render() {
 			playerMakingMove = true;
 		}
 	}
+	*/
 
+/*
 	if (playerMadeMove) {
 		playerReadyToMove = false;
 		playerMakingMove = false;
@@ -1099,6 +1086,7 @@ function render() {
 
 		checkDisplayAndStuff();
 	}
+	*/
 
 	if (currentCoordX == 4 && currentCoordZ == 0) {
 		if (!platformAdded) {
