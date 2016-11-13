@@ -98,6 +98,7 @@ var interim_transcript = '';
 //make sure api is supported by browser
 if (!('webkitSpeechRecognition' in window)) {
     //Speech API not supported here…
+    alert("This won't work here");
 } else { //Let’s do some cool stuff :)
     var recognition = new webkitSpeechRecognition(); //That is the object that will manage our whole recognition process. 
     recognition.continuous = true;   //Suitable for dictation. 
@@ -127,6 +128,7 @@ recognition.onresult = function(event) { //the event holds the results
     if (typeof(event.results) === 'undefined') { //Something is wrong…
         final_transcript = '';
         console.log('undefined');
+        alert('undefined');
         return;
     }
 
@@ -155,10 +157,6 @@ recognition.onresult = function(event) { //the event holds the results
 
 //button that starts the listener
 
-   function startButton(event) {
-    recognition.start();
-    start_img.src = 'https://speechlogger.appspot.com/images/micslash2.png'; //We change the image to a slashed until the user approves the browser to listen and recognition actually starts. Then – we’ll change the image to ‘mic on’.
-};
 
 
 
@@ -611,12 +609,17 @@ var tick = 0;
 
 var targetStr = "";
 
+
+recognition.start();
+
 function render() {
+	
 
 	targetStr = final_transcript;
 
 	var target = targetStr.split("");
 	var counter = 0;
+	var vc = 0;
 	
 	requestAnimationFrame(render);
 
@@ -720,15 +723,17 @@ function render() {
 			if (t.isBlob) {
 				target.shift();
 				counter++;
+
+				if (counter > 10) { counter = 0; vc++; }
 				//console.log(target.toString());
 				var extra = (targetStr.length * 3 / 2) - (3 * counter)
 
-				var targetVector = new THREE.Vector3(camVector.x * 75 + extra * Math.PI / 180, camVector.y * 75, camVector.z * 75 + extra * Math.PI / 180);
+				var targetVector = new THREE.Vector3(75, 75 - 10 * vc, -75);
 				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180);
 
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
-				l.mesh.rotation.y = 0;
-				console.log(l.mesh.rotation);
+				//l.mesh.rotation.y = 0;
+				//console.log(l.mesh.rotation);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
@@ -789,13 +794,13 @@ $("body").on("mousemove", function(event) {
 });
 
 $("body").bind("keypress", function(event) {		
- 	if (event.which == 97) {		cameraDistance
- 		targetStr = "Phenylpropylaminopentane";
+ 	if (event.which == 97) {		
+ 		
  	} else if (event.which == 98) {	
  		console.log(final_transcript);	
  		targetStr = final_transcript;
  	} else if (event.which == 99) {		
- 		targetStr = "Lucy pls";
+ 		//recognition.stop();
  	} else if (event.which == 32){ //Press Space to see spike
  		spikeBool = !spikeBool;
  	}  else if (event.which == 122){
