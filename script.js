@@ -314,17 +314,9 @@ thing.prototype.assignNewDestination = function() {
 		return;
 	}
 
-	if (gyroPresent) {
-		return new THREE.Vector3(
-		Math.random() * 500 - 250,
-		Math.random() * 35 - 55,
-		Math.random() * 500 - 250
-	);
-	}
-
 	return new THREE.Vector3(
 		Math.random() * 1000 - 500,
-		Math.random() * 10 - 30,
+		Math.random() * 20 - 50,
 		Math.random() * 1000 - 500
 	);
 
@@ -382,7 +374,7 @@ var letter = function(type, character, font) {
 	this.sceneTickToForm = 100;
 	this.sceneArrived = false;
 
-	this.stuck = false;
+	this.frozen = false;
 
 	
 	// snowflakes
@@ -457,7 +449,9 @@ letter.prototype.update = function() {
 			this.sceneTick++;
 
 			if (this.sceneTickToForm <= 0) {
-				//this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				if (!this.frozen) {
+					this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				}
 
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
@@ -701,7 +695,8 @@ function render() {
 					//l.mesh.lookAt(camera.position);
 				}
 				//console.log(camVector);
-				l.randomFactor = 0;
+				//l.randomFactor = 0;
+				l.frozen = true;
 				l.sceneArrived = false;
 			}
 		}
@@ -731,6 +726,7 @@ function render() {
 		    (vect.z>lowerBoundZ-offset) && (vect.z<higherBoundZ+offset) && smallNoiseBool))
 		{ //Wave generator
 			l.setDestination(vect.x+10,vect.y+globalAmplitude*Math.cos(l.wave),currentDirect.z);
+			l.frozen = false;
 			l.wave+=Math.PI/50;
 			l.waveCounter+=1;
 			//console.log("Testing sin wave");
@@ -744,7 +740,7 @@ function render() {
 			if (t.isBlob) {
 				l.wave = 0;
 				l.waveCounter = 0;
-				l.randomFactor = Math.random() - 0.5;
+				//l.randomFactor = Math.random() - 0.5;
 				var newDest = t.assignNewDestination();
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 				l.sceneArrived = false;

@@ -426,7 +426,7 @@ var letter = function(type, character, font) {
 	this.sceneTickToForm = 100;
 	this.sceneArrived = false;
 
-	this.stuck = false;
+	this.frozen = false;
 
 	
 	// snowflakes
@@ -501,7 +501,9 @@ letter.prototype.update = function() {
 			this.sceneTick++;
 
 			if (this.sceneTickToForm <= 0) {
-				//this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				if (!this.frozen) {
+					this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				}
 
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
@@ -752,7 +754,7 @@ function render() {
 					//l.mesh.lookAt(camera.position);
 				}
 				//console.log(camVector);
-				l.randomFactor = 0;
+				l.frozen = true;
 				l.sceneArrived = false;
 			}
 		}
@@ -793,7 +795,7 @@ function render() {
 		} else if (l.sceneArrived) {
 			var t = things[l.thingID];
 			if (t.isBlob) {
-				l.randomFactor = Math.random() - 0.5;
+				l.frozen = false;
 				var newDest = t.assignNewDestination();
 				l.setDestination(newDest.x, newDest.y, newDest.z);
 				l.sceneArrived = false;
