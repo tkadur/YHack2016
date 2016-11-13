@@ -197,7 +197,7 @@ var webaudio_tooling_obj = function () {
              globalAmplitude += array[i];
             }
             globalAmplitude/=array.length;
-            // console.log(globalAmplitude);
+            //console.log(globalAmplitude);
         }
 
       };
@@ -842,7 +842,7 @@ function render() {
 		}
 		var offset = 100; //Slightly wider bound
 		//Continously creates waves until pressed again...letters however disperse after cycle counter
-		if  (globalAmplitude>40)
+		if  (globalAmplitude>135)
 		{ //Wave generator
 			l.setDestination(vect.x+10,vect.y+(globalAmplitude/2)*Math.cos(l.wave),currentDirect.z);
 			l.wave+=Math.PI/50;
