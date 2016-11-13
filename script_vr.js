@@ -698,6 +698,8 @@ function render() {
 	}
 
 	for (var i = 0; i < target.length; i++) {
+		//sceneLetters[i].text = target[i];
+		
 		var tmp = sceneLetters.shift();
 		tmp.text = target[i];
 		sceneLetters.unshift(tmp);

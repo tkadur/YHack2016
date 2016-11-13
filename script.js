@@ -680,9 +680,9 @@ function render() {
 				//console.log(target.toString());
 				var extra = - (3 * counter)
 
-				var targetVector = new THREE.Vector3(camVector.x * 75, camVector.y * 75 - 10 * vc, camVector.z * 75);
+				var targetVector = new THREE.Vector3(camVector.x * 75 - 10, camVector.y * 75 - 10 * vc + 25, camVector.z * 75);
 				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 6);
-				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 36);
+				//targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 36);
 
 				//var a = targetVector.angleTo(new THREE.Vector3(targetVector.x, targetVector.y, 1));
 
@@ -726,7 +726,6 @@ function render() {
 		    (vect.z>lowerBoundZ-offset) && (vect.z<higherBoundZ+offset) && smallNoiseBool))
 		{ //Wave generator
 			l.setDestination(vect.x+10,vect.y+globalAmplitude*Math.cos(l.wave),currentDirect.z);
-			l.frozen = false;
 			l.wave+=Math.PI/50;
 			l.waveCounter+=1;
 			//console.log("Testing sin wave");
@@ -740,6 +739,7 @@ function render() {
 			if (t.isBlob) {
 				l.wave = 0;
 				l.waveCounter = 0;
+				l.frozen = false;
 				//l.randomFactor = Math.random() - 0.5;
 				var newDest = t.assignNewDestination();
 				l.setDestination(newDest.x, newDest.y, newDest.z);
