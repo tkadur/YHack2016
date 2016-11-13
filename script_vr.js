@@ -84,6 +84,49 @@ THREE.DeviceOrientationControls = function ( object ) {
         this.connect();
  
 };
+THREE.StereoEffect = function ( renderer ) {
+
+	var _stereo = new THREE.StereoCamera();
+	_stereo.aspect = 0.5;
+
+	this.setEyeSeparation = function ( eyeSep ) {
+
+		_stereo.eyeSep = eyeSep;
+
+	};
+
+	this.setSize = function ( width, height ) {
+
+		renderer.setSize( width, height );
+
+	};
+
+	this.render = function ( scene, camera ) {
+
+		scene.updateMatrixWorld();
+
+		if ( camera.parent === null ) camera.updateMatrixWorld();
+
+		_stereo.update( camera );
+
+		var size = renderer.getSize();
+
+		if ( renderer.autoClear ) renderer.clear();
+		renderer.setScissorTest( true );
+
+		renderer.setScissor( 0, 0, size.width / 2, size.height );
+		renderer.setViewport( 0, 0, size.width / 2, size.height );
+		renderer.render( scene, _stereo.cameraL );
+
+		renderer.setScissor( size.width / 2, 0, size.width / 2, size.height );
+		renderer.setViewport( size.width / 2, 0, size.width / 2, size.height );
+		renderer.render( scene, _stereo.cameraR );
+
+		renderer.setScissorTest( false );
+
+	};
+
+};
 
 var timer = 0;
 
@@ -179,16 +222,27 @@ var camera = new THREE.PerspectiveCamera(
 var controls;
 controls = new THREE.DeviceOrientationControls( camera );
 
+ controls.noZoom = true;
+ controls.noPan = true;
+
 // http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
 	antialias: true
 });
 renderer.setClearColor(0xffffff);
-renderer.autoClear = false;
+renderer.autoClear = true;
 renderer.setSize(
-	window.innerWidth,
-	window.innerHeight);
+	1280,
+	720);
+effect = new THREE.StereoEffect(renderer);
+//effect.setClearColor(0xffffff);
 document.body.appendChild(renderer.domElement);
+
+var wscale = window.innerWidth / 1280;
+var hscale = window.innerHeight / 720;
+
+renderer.domElement.style.width = renderer.domElement.width * wscale + 'px';
+renderer.domElement.style.height = renderer.domElement.height * hscale + 'px';
 
 var dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(100, 100, 50);
@@ -257,7 +311,7 @@ function getFormerString(type) {
 }
 
 var things = [];
-var encounters = [false]; // length = # of types of things
+//var encounters = [false]; // length = # of types of things
 
 function shuffle(a) {
     var j, x, i;
@@ -285,7 +339,7 @@ var thing = function(type, position) {
 	if (gyroPresent) {
 		this.numLettersRequired = 500;
 	} else {
-		this.numLettersRequired = 3500;
+		this.numLettersRequired = 500;
 	}
 	this.isBlob = true;
 	
@@ -310,14 +364,6 @@ var thing = function(type, position) {
 thing.prototype.assignNewDestination = function() {
 	if (!this.isBlob) {
 		return;
-	}
-
-	if (gyroPresent) {
-		return new THREE.Vector3(
-		Math.random() * 500 - 250,
-		Math.random() * 35 - 55,
-		Math.random() * 500 - 250
-	);
 	}
 
 	return new THREE.Vector3(
@@ -384,7 +430,7 @@ var letter = function(type, character, font) {
 
 	
 	// snowflakes
-	this.isSnowflake = false;
+	//this.isSnowflake = false;
 	
 }
 
@@ -508,23 +554,26 @@ function checkDisplayAndStuff() {
 	
 	for (var i = 0; i < things.length; i++) {
 		var t = things[i];
-		var dist = t.position.distanceToSquared(player.position);
-		if (i == 0 || dist <= visibility * visibility) {
+		//var dist = t.position.distanceToSquared(player.position);
+		//if (i == 0 || dist <= visibility * visibility) {
 			t.isDisplayed = true;
 
+			/*
 			if (!encounters[t.type]) {
 				encounters[t.type] = true;
 			}
+			*/
 
 			if (!t.isFormed) {
 				t.isFormed = true;
 				var numLetters = t.numLettersRequired;
-				var numLettersPerString = getFormerString(t.type).length;
+				var numLettersPerString = allString.length;
 				var numStrings = Math.ceil(numLetters / numLettersPerString);
 				for (var x = 0; x < numStrings; x++) {
-					addReserveString(getFormerString(t.type), t.ID);
+					addReserveString(allString, t.ID);
 				}
 			}
+		/*
 		} else {
 			t.isDisplayed = false;
 			if (t.isFormed) {
@@ -538,9 +587,10 @@ function checkDisplayAndStuff() {
 				t.numLettersFormed = 0;
 			}
 		}
+		*/
 	}
 	
-	playerReadyToMove = true;
+	//playerReadyToMove = true;
 }
 
 function init(font) {
@@ -565,6 +615,8 @@ var targetStr = "";
 
 recognition.start();
 
+var clock = new THREE.Clock();
+
 function render() {
 	
 	var timeout;
@@ -585,15 +637,19 @@ function render() {
 	
 	requestAnimationFrame(render);
 
-	renderer.clear();
+	//effect.clear();
 	/*
 	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(consoleScene, consoleCamera);
 
 	renderer.clearDepth();
 	*/
-	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-	renderer.render(scene, camera);
+	//effect.setViewport(0, 0, window.innerWidth, window.innerHeight);
+	//renderer.render(scene, camera);
+
+	//update(clock.getDelta());
+	//effect.render(clock.getDelta());
+	effect.render(scene, camera);
 
 	tick++;
 	if (gyroPresent) {
@@ -608,6 +664,7 @@ function render() {
 
 	camera.getWorldDirection(camVector);
 
+	/*
 	for (var iter = 0; iter < 1; iter++) {
 		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
 		flake.isSnowflake = true;
@@ -632,7 +689,7 @@ function render() {
 		consoleLetters.push(flake);
 	}
 	
-	
+	*/
 	for (var i = 0; i < consoleLetters.length; i++) {
 		var l = consoleLetters[i];
 		if (l.isDead) {
@@ -640,9 +697,11 @@ function render() {
 			consoleLetters.splice(i, 1);
 		}
 		
+		/*
 		if (l.isSnowflake && l.position.y < -100) {
 			l.free();
 		}
+		*/
 		
 		
 		l.update();
