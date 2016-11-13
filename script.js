@@ -315,14 +315,14 @@ thing.prototype.assignNewDestination = function() {
 	if (gyroPresent) {
 		return new THREE.Vector3(
 		Math.random() * 500 - 250,
-		Math.random() * 35 - 45,
+		Math.random() * 35 - 55,
 		Math.random() * 500 - 250
 	);
 	}
 
 	return new THREE.Vector3(
 		Math.random() * 1000 - 500,
-		Math.random() * 50 - 60,
+		Math.random() * 50 - 70,
 		Math.random() * 1000 - 500
 	);
 
@@ -570,7 +570,7 @@ function render() {
 	var timeout;
 
 	if (gyroPresent) {
-		timeout = 25000;
+		timeout = 30000;
 	} else {
 		timeout = 10000;
 	}
@@ -686,13 +686,13 @@ function render() {
 				target.shift();
 				counter++;
 
-				if (counter > 20 && l.text == " ") { counter = 0; vc++; }
+				if (counter > 15 && l.text == " ") { counter = 0; vc++; }
 				//console.log(target.toString());
 				var extra = - (3 * counter)
 
 				var targetVector = new THREE.Vector3(0, 25- 10 * vc, 75);
-				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 4.25);
-				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 10);
+				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 8);
+				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 36);
 
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
 				//l.mesh.rotation.y = Math.PI;
