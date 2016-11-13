@@ -85,6 +85,8 @@ THREE.DeviceOrientationControls = function ( object ) {
  
 };
 
+var timer = 0;
+
 var gyroPresent = false;
 window.addEventListener("devicemotion", function(event){
     if(event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)
@@ -92,130 +94,71 @@ window.addEventListener("devicemotion", function(event){
 });
 
 var final_transcript = '';
-//var interim_transcript = '';
-var ignore_onend = false;
-var recognizing = false;
-var recognition = null;
+var interim_transcript = '';
 //var resetSentence = 0;
 // start speech
 //make sure api is supported by browser
 if (!('webkitSpeechRecognition' in window)) {
     //Speech API not supported here…
-    alert("This won't work here");
+    //alert("This won't work here");
 } else { //Let’s do some cool stuff :)
-    recognition = new webkitSpeechRecognition(); //That is the object that will manage our whole recognition process. 
+    var recognition = new webkitSpeechRecognition(); //That is the object that will manage our whole recognition process. 
     recognition.continuous = true;   //Suitable for dictation. 
-    recognition.interimResults = true;  //If we want to start receiving results even if they are not final.
+    recognition.interimResults = false;  //If we want to start receiving results even if they are not final.
     //Define some more additional parameters for the recognition:
     recognition.lang = "en-US"; 
     recognition.maxAlternatives = 1; //Since from our experience, the highest result is really the best...
+}
 
+//what should happen while the voice is being processed
+recognition.onstart = function() {
+    //Listening (capturing voice from audio input) started.
+    //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
+};
 
-	//what should happen while the voice is being processed
-	recognition.onstart = function() {
-	    //Listening (capturing voice from audio input) started.
-	    //This is a good place to give the user visual feedback about that (i.e. flash a red light, etc.)
-	    recognizing = true;
-	};
+recognition.onend = function() {
+    //Again – give the user feedback that you are not listening anymore. If you wish to achieve continuous recognition – you can write a script to start the recognizer again here.
+//final_transcript = '';
+console.log('Speech recognition service disconnected');
+recognition.start();
 
+};
 
-	recognition.onerror= function(event) {
-		if (event.error == 'no-speech') {
-			//alert("No speech!");
-			ignore_onend = true;
-		}
-		if (event.error == 'audio-capture') {
-			//alert("No mic!");
-			ignore_onend = true;
-		}
-		if (event.error == 'not-allowed') {
-			//alert("No access!");
-			ignore_onend = true;
-		}
-		recognition.start();
-	}
-
-
-	recognition.onend = function() {
-	    //Again – give the user feedback that you are not listening anymore. If you wish to achieve continuous recognition – you can write a script to start the recognizer again here.
-	//final_transcript = '';
-	recognizing = false;
-	//if (ignore_onend) { return; }
-	//if (!final_transcript) {return;}
-	console.log('Speech recognition service disconnected');
-	//alert("stopped!");
+recognition.onerror=function() {
 	recognition.start();
-
-	};
-
-	recognition.onresult = function(event) { //the event holds the results
-	//Yay – we have results! Let’s check if they are defined and if final or not:
-
-		var interim_transcript = '';
-		for (var i = event.resultIndex; i < event.results.length; ++i) {
-			if (event.results[i].isFinal) {
-				final_transcript += event.results[i][0].transcript;
-				interim_transcript = '';
-				console.log("Final:" + final_transcript);
-
-			} else {
-				interim_transcript += event.results[i][0].transcript;
-				console.log("Interim:" + interim_transcript);
-
-			}
-
-			if(final_transcript.length > 15)
-	      	{
-	      		final_transcript = '';
-	      	}
-		}
-
-	/*
-	    if (typeof(event.results) === 'undefined') { //Something is wrong…
-	        final_transcript = '';
-	        console.log('undefined');
-	        alert('undefined');
-	        return;
-	    }
-	 
-	 	for (var i = event.resultIndex; i < event.results.length; ++i) {
-	 		console.log("Running")
-	      if (event.results[i].isFinal) {
-
-	      	if(final_transcript.length > 15)
-	      	{
-	      		final_transcript = '';
-	      	}
-
-	        final_transcript += event.results[i][0].transcript;
-	        interim_transcript = '';
-	        console.log("Final:" + final_transcript);
-
-	      } else {
-	        interim_transcript += event.results[i][0].transcript;
-	        console.log("Interim:" + interim_transcript);
-	      }
-	    }
-	    ignore_onend = false;
-	   */
-
-	}; 
-
- }
-
-//button that starts the listener
+}
 
 
+recognition.onresult = function(event) { //the event holds the results
+//Yay – we have results! Let’s check if they are defined and if final or not:
+ 	for (var i = event.resultIndex; i < event.results.length; ++i) {
+ 		console.log("Running")
+      if (event.results[i].isFinal) {
 
+      	if(final_transcript.length > 15)
+      	{
+      		final_transcript = '';
+      	}
 
+        final_transcript += event.results[i][0].transcript;
+        interim_transcript = '';
+        console.log("Final:" + final_transcript);
+        timer = (new Date()).getTime();
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+        console.log("Interim:" + interim_transcript);
+      }
+    }
+    recognition.start();
 
+}; 
 
 var camVector = new THREE.Vector3();
 
 
 var scene = new THREE.Scene();
 var consoleScene = new THREE.Scene();
-
+/*
 var platform_geo, platform_material, platform_mesh;
 
 var platformAdded = false;
@@ -226,7 +169,7 @@ platform_geo = new THREE.BoxGeometry(100, 10, 100);
 platform_mesh = new THREE.Mesh(platform_geo, platform_material);
 
 platform_mesh.position.set(1600, -150, 0);
-
+*/
 var camera = new THREE.PerspectiveCamera(
 	75,
 	window.innerWidth / window.innerHeight,
@@ -235,13 +178,7 @@ var camera = new THREE.PerspectiveCamera(
 
 var controls;
 controls = new THREE.DeviceOrientationControls( camera );
-/*
-var consoleCamera = new THREE.PerspectiveCamera(
-	75,
-	window.innerWidth / window.innerHeight,
-	0.1,
-	500);
-*/
+
 // http://stackoverflow.com/a/29269912/1517227
 var renderer = new THREE.WebGLRenderer({
 	antialias: true
@@ -286,7 +223,7 @@ fontLoader.load("fonts/lmmrfont.typeface.json", function(response) {
 var smallTextGeometries = [];
 //var largeTextGeometries = [];
 
-var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *:"
+var allString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. *:'"
 
 var letterHeight = 9;
 var reserveMultiplier = 0.7;
@@ -346,7 +283,7 @@ var thing = function(type, position) {
 	this.colors = [];
 
 	if (gyroPresent) {
-		this.numLettersRequired = 1500;
+		this.numLettersRequired = 500;
 	} else {
 		this.numLettersRequired = 3500;
 	}
@@ -377,7 +314,7 @@ thing.prototype.assignNewDestination = function() {
 
 	return new THREE.Vector3(
 		Math.random() * 1000 - 500,
-		Math.random() * 50 - 53,
+		Math.random() * 50 - 60,
 		Math.random() * 1000 - 500
 	);
 
@@ -439,7 +376,7 @@ var letter = function(type, character, font) {
 
 	
 	// snowflakes
-	//this.isSnowflake = false;
+	this.isSnowflake = false;
 	
 }
 
@@ -612,57 +549,17 @@ function init(font) {
 
 	// ask the player to make a move
 }
-/*
-function addConsoleString(s) {
-	for (var i = 0; i < s.length; i++) {
-		if (s[i] != "\n") {
-			var l = new letter(console_type, s[i], font);
-			l.setDestination(currentConsoleX, currentConsoleY, 0);
-			l.setPosition(currentConsoleX, currentConsoleY + Math.random() - 0.5, 0);
-			l.consoleLineIndex = currentLineIndex;
 
-			consoleScene.add(l.mesh);
-			consoleLetters.push(l);
-
-			currentConsoleX += letterWidth;
-			if (currentConsoleX >= consoleX + consoleWidth - 5 && s[i] == " ") {
-				currentConsoleX = consoleX;
-				currentConsoleY -= letterHeight * 1.3;
-				currentLineIndex++;
-			}
-		} else {
-			currentConsoleX = consoleX;
-			currentConsoleY -= letterHeight * 1.3;
-			currentLineIndex++;
-		}
-
-		if (currentConsoleY < consoleHeight) {
-			currentConsoleY += letterHeight * 1.3;
-			currentLineIndex--;
-
-			for (var j = 0; j < consoleLetters.length; j++) {
-				var nl = consoleLetters[j];
-				if (nl.consoleLineIndex == 0) {
-					nl.free();
-				} else {
-					nl.destination.add(new THREE.Vector3(0, letterHeight * 1.3, 0));
-					nl.consoleLineIndex--;
-				}
-			}
-		}
-	}
-}
-*/
 var tick = 0;
 
 var targetStr = "";
 
 
 recognition.start();
-ignore_onend = false;
 
 function render() {
 	
+	if ((new Date()).getTime() - timer > 10000) { final_transcript = ""; }
 
 	targetStr = final_transcript;
 
@@ -773,16 +670,17 @@ function render() {
 				target.shift();
 				counter++;
 
-				if (counter > 10 && l.text == " ") { counter = 0; vc++; }
+				if (counter > 20 && l.text == " ") { counter = 0; vc++; }
 				//console.log(target.toString());
-				var extra = -(counter * 3);
+				var extra = - (3 * counter)
 
-				var targetVector = new THREE.Vector3(camVector.x * 75, (camVector.y * 75) - 10 * vc, camVector.z * 75);
-				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180);
+				var targetVector = new THREE.Vector3(0, 25- 10 * vc, 75);
+				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 4.25);
+				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 10);
 
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
 				//l.mesh.rotation.y = Math.PI;
-				//console.log(l.mesh.rotation);
+				//console.log(camVector);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
@@ -837,6 +735,20 @@ function render() {
 
 render();
 
+$(document).ready(function() {
+
+  if (navigator.userAgent.match(/Android/i)) {
+    window.scrollTo(0,0); // reset in case prev not scrolled  
+    var nPageH = $(document).height();
+    var nViewH = window.outerHeight;
+    if (nViewH > nPageH) {
+      nViewH -= 250;
+      $('BODY').css('height',nViewH + 'px');
+    }
+    window.scrollTo(0,1);
+  }
+
+});
 $("body").on("mousemove", function(event) {
 	rotationY = -(event.pageX - window.innerWidth / 2) * 0.01;
 	rotationX = -(event.pageY - window.innerHeight / 2) * 0.01;
