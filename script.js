@@ -586,12 +586,6 @@ function render() {
 	requestAnimationFrame(render);
 
 	renderer.clear();
-	/*
-	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-	renderer.render(consoleScene, consoleCamera);
-
-	renderer.clearDepth();
-	*/
 	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
 	renderer.render(scene, camera);
 

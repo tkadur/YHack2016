@@ -232,18 +232,18 @@ var renderer = new THREE.WebGLRenderer({
 renderer.setClearColor(0xffffff);
 renderer.autoClear = true;
 renderer.setSize(
-	1280,
-	720);
+	window.innerWidth,
+	window.innerHeight);
 effect = new THREE.StereoEffect(renderer);
 //effect.setClearColor(0xffffff);
 document.body.appendChild(renderer.domElement);
-
+/*
 var wscale = window.innerWidth / 1280;
 var hscale = window.innerHeight / 720;
 
 renderer.domElement.style.width = renderer.domElement.width * wscale + 'px';
 renderer.domElement.style.height = renderer.domElement.height * hscale + 'px';
-
+*/
 var dirLight = new THREE.DirectionalLight(0xffffff, 1);
 dirLight.position.set(100, 100, 50);
 scene.add(dirLight);
@@ -501,7 +501,7 @@ letter.prototype.update = function() {
 			this.sceneTick++;
 
 			if (this.sceneTickToForm <= 0) {
-				this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				//this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
 
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
@@ -637,18 +637,8 @@ function render() {
 	
 	requestAnimationFrame(render);
 
-	//effect.clear();
-	/*
-	renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-	renderer.render(consoleScene, consoleCamera);
 
-	renderer.clearDepth();
-	*/
-	//effect.setViewport(0, 0, window.innerWidth, window.innerHeight);
-	//renderer.render(scene, camera);
 
-	//update(clock.getDelta());
-	//effect.render(clock.getDelta());
 	effect.render(scene, camera);
 
 	tick++;
@@ -664,7 +654,6 @@ function render() {
 
 	camera.getWorldDirection(camVector);
 
-	
 	for (var iter = 0; iter < 1; iter++) {
 		var flake = new letter(console_type, "abcdefghijklmnopqrstuvwxyz"[Math.floor(Math.random() * 26)], font);
 		flake.isSnowflake = true;
