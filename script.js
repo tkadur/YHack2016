@@ -87,6 +87,8 @@ THREE.DeviceOrientationControls = function ( object ) {
 
 var timer = 0;
 
+var globalAmplitude = 40;
+
 var gyroPresent = false;
 window.addEventListener("devicemotion", function(event){
     if(event.rotationRate.alpha || event.rotationRate.beta || event.rotationRate.gamma)
@@ -322,7 +324,7 @@ thing.prototype.assignNewDestination = function() {
 
 	return new THREE.Vector3(
 		Math.random() * 1000 - 500,
-		Math.random() * 50 - 70,
+		Math.random() * 10 - 30,
 		Math.random() * 1000 - 500
 	);
 
@@ -357,8 +359,8 @@ var letter = function(type, character, font) {
 	this.geometry;
 	this.geometry = getSmallTextGeometry(this.text);
 
-	this.waving = false;
 	this.wave = 0;
+	this.waveCounter = 0;
 
 	this.material = new THREE.MeshBasicMaterial({
 		color: 0x000000,
@@ -726,20 +728,22 @@ function render() {
 		var offset = 100; //Slightly wider bound
 		//Continously creates waves until pressed again...letters however disperse after cycle counter
 		if (((vect.x>lowerBoundX-offset) && (vect.x<higherBoundX+offset) &&
-		    (vect.z>lowerBoundZ-offset) && (vect.z<higherBoundZ+offset) &&
-		         smallNoiseBool) || l.waving)
+		    (vect.z>lowerBoundZ-offset) && (vect.z<higherBoundZ+offset) && smallNoiseBool))
 		{ //Wave generator
-			l.setDestination(vect.x+10,vect.y+20*Math.cos(l.wave),currentDirect.z);
+			l.setDestination(vect.x+10,vect.y+globalAmplitude*Math.cos(l.wave),currentDirect.z);
 			l.wave+=Math.PI/50;
 			l.waveCounter+=1;
 			//console.log("Testing sin wave");
-			if (l.waveCounter>1000){
+			if (l.wave>4*Math.PI){
 				l.waveCounter = 0;
-				l.waving = false;
+				l.wave = 0;
+				smallNoiseBool = false;
 			}
 		} else if (l.sceneArrived) {
 			var t = things[l.thingID];
 			if (t.isBlob) {
+				l.wave = 0;
+				l.waveCounter = 0;
 				l.randomFactor = Math.random() - 0.5;
 				var newDest = t.assignNewDestination();
 				l.setDestination(newDest.x, newDest.y, newDest.z);
@@ -783,7 +787,8 @@ $("body").bind("keypress", function(event) {
  	} else if (event.which == 32){ //Press Space to see spike
  		spikeBool = !spikeBool;
  	}  else if (event.which == 122){
- 		console.log("Z key Pressed");
- 		smallNoiseBool = !smallNoiseBool;
+ 		console.log("Z key Pressed!!");
+ 		// smallNoiseBool = !smallNoiseBool;
+ 		smallNoiseBool = true;
  	}
  })
