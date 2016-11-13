@@ -748,12 +748,20 @@ function render() {
 				//console.log(target.toString());
 				var extra = - (3 * counter)
 
-				var targetVector = new THREE.Vector3(0, 25- 10 * vc, 75);
-				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 8);
+				var targetVector = new THREE.Vector3(camVector.x * 75, camVector.y * 75 - 10 * vc, camVector.z * 75);
+				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 6);
 				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 36);
 
+				//var a = targetVector.angleTo(new THREE.Vector3(targetVector.x, targetVector.y, 1));
+
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
-				//l.mesh.rotation.y = Math.PI;
+				if (l.mesh) {
+					//l.up = new THREE.Vector3( 1, 0, 0 );
+					l.mesh.rotation.y = camera.rotation.y;
+					//console.log(l.mesh.rotation);
+					//var vector = l.mesh.parent.worldToLocal(camera.getWorldPosition());
+					//l.mesh.lookAt(camera.position);
+				}
 				//console.log(camVector);
 				l.randomFactor = 0;
 				l.sceneArrived = false;

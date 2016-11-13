@@ -455,7 +455,7 @@ letter.prototype.update = function() {
 			this.sceneTick++;
 
 			if (this.sceneTickToForm <= 0) {
-				this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
+				//this.mesh.rotation.y = Math.PI - this.sceneTick * this.randomFactor * 0.01;
 
 				if (this.mesh.position.distanceTo(this.destination) < 2) {
 					this.sceneArrived = true;
@@ -694,16 +694,17 @@ function render() {
 				targetVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), extra * Math.PI / 180 + Math.PI / 6);
 				targetVector.applyAxisAngle(new THREE.Vector3(1, 0, 0), -Math.PI / 36);
 
-				//var a = targetVector.angleTo(new Vector3(targetVector.x, targetVector.y, 1));
+				//var a = targetVector.angleTo(new THREE.Vector3(targetVector.x, targetVector.y, 1));
 
 				l.setDestination(targetVector.x, targetVector.y, targetVector.z);
 				if (l.mesh) {
-					l.up = new THREE.Vector3( 1, 0, 0 );
-					l.mesh.quaternion.copy(camera.quaternion);
+					//l.up = new THREE.Vector3( 1, 0, 0 );
+					l.mesh.rotation.y = camera.rotation.y;
+					//console.log(l.mesh.rotation);
 					//var vector = l.mesh.parent.worldToLocal(camera.getWorldPosition());
 					//l.mesh.lookAt(camera.position);
 				}
-				console.log(camVector);
+				//console.log(camVector);
 				l.randomFactor = 0;
 				l.sceneArrived = false;
 			}
