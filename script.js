@@ -312,6 +312,14 @@ thing.prototype.assignNewDestination = function() {
 		return;
 	}
 
+	if (gyroPresent) {
+		return new THREE.Vector3(
+		Math.random() * 500 - 250,
+		Math.random() * 35 - 45,
+		Math.random() * 500 - 250
+	);
+	}
+
 	return new THREE.Vector3(
 		Math.random() * 1000 - 500,
 		Math.random() * 50 - 60,
@@ -559,7 +567,15 @@ recognition.start();
 
 function render() {
 	
-	if ((new Date()).getTime() - timer > 10000) { final_transcript = ""; }
+	var timeout;
+
+	if (gyroPresent) {
+		timeout = 25000;
+	} else {
+		timeout = 10000;
+	}
+
+	if ((new Date()).getTime() - timer > timeout) { final_transcript = ""; }
 
 	targetStr = final_transcript;
 
